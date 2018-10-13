@@ -1,12 +1,9 @@
-package org.clueless.motionplanning.field_positioning.field_position_modules.Odometry;
+package org.clueless.motionplanning.field_positioning.field_position_modules.odometry;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
 
-import org.clueless.motionplanning.field_positioning.field_position_modules.Encoder;
+import org.clueless.motionplanning.field_positioning.field_position_modules.odometry.encoders.Encoder;
 import org.clueless.motionplanning.math.TwoDimensionalTransform;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 
 public class XY_Layout extends FieldPositionModule_Odometry {
 

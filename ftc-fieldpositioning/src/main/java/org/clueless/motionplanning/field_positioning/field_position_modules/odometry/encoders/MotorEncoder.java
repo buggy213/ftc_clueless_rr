@@ -1,7 +1,9 @@
-package org.clueless.motionplanning.field_positioning.field_position_modules;
+package org.clueless.motionplanning.field_positioning.field_position_modules.odometry.encoders;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.clueless.motionplanning.field_positioning.field_position_modules.odometry.encoders.Encoder;
 
 public class MotorEncoder extends Encoder {
 

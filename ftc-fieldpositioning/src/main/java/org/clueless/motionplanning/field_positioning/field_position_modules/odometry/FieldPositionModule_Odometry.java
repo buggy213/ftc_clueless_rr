@@ -1,11 +1,6 @@
-package org.clueless.motionplanning.field_positioning.field_position_modules.Odometry;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
+package org.clueless.motionplanning.field_positioning.field_position_modules.odometry;
 
 import org.clueless.motionplanning.field_positioning.FieldPositionModule;
-import org.firstinspires.ftc.robotcore.external.android.AndroidGyroscope;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 
 
 //

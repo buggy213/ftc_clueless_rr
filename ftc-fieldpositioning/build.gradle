@@ -1,16 +1,18 @@
-/*apply plugin: 'com.android.library'
+apply plugin: 'com.android.library'
 
 android {
-    defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 19
-    }
-
     compileSdkVersion 23
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -21,9 +23,7 @@ android {
     }
 
 }
-*/
 
-apply plugin: 'java'
 repositories {
     flatDir {
         dirs rootProject.file('libs')
@@ -40,8 +40,9 @@ dependencies {
     implementation (name: 'FtcCommon-release', ext: 'aar')
     implementation (name: 'WirelessP2p-release', ext:'aar')
     implementation (name: 'Jama-1.0.3', ext: 'jar')
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-
+    implementation project (':ftc-motionplanning')
+    implementation 'com.android.support:appcompat-v7:23.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

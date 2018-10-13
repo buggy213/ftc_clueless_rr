@@ -2,11 +2,11 @@ package org.clueless.motionplanning.field_positioning;
 
 import org.clueless.motionplanning.math.TwoDimensionalTransform;
 import org.clueless.motionplanning.math.Vector2;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public abstract class FieldPositionModule {
     protected TwoDimensionalTransform transform;
+
+    public boolean isActive;
 
     public void SetReferencePosition(TwoDimensionalTransform referencePosition) {
         transform = referencePosition;
@@ -15,7 +15,7 @@ public abstract class FieldPositionModule {
     public abstract TwoDimensionalTransform Update();
 
     /**
-     * Updates robot position based on x + y components as well as a change in the angle
+     * Updates robot vector based on x + y components as well as a change in the angle
      * @param deltaX Horizontal movement (in mm)
      * @param deltaY Vertical movement (in mm)
      * @param deltaAngle Change in angle

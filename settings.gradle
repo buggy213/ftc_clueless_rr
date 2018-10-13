@@ -1,4 +1,4 @@
-include ':FtcRobotController', ':clueless-motion-planning', ':ftc-motionplanning'
+include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning'
 include ':TeamCode'
 include ':openCVLibrary3'
 include ':endercv'
