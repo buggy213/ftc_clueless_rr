@@ -1,6 +1,6 @@
 package org.clueless.motionplanning.planning.kinematics;
 // Based on https://ocw.mit.edu/courses/mechanical-engineering/2-12-introduction-to-robotics-fall-2005/lecture-notes/chapter4.pdf
-public class ThreeLinkedArmKinematics {
+public class ThreeJointedArmKinematics {
     double L1;
     double L2;
     double L3;
