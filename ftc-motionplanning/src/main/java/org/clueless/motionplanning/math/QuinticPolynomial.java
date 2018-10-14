@@ -3,7 +3,7 @@ import Jama.LUDecomposition;
 import Jama.Matrix;
 
 // See https://github.com/acmerobotics/road-runner/blob/master/doc/pdf/Quintic_Splines_for_FTC.pdf
-public class QuinticPolynomial {
+public class QuinticPolynomial implements ParametricEquation{
     private static double[][] COEFF_MATRIX = {
             {0,0,0,0,0,1},
             {0,0,0,0,1,0},
@@ -31,7 +31,9 @@ public class QuinticPolynomial {
 
     }
 
+    @Override
     public double get(double t) {
         return a * (t * t * t * t * t) + d * (t * t * t * t) + c * (t * t * t) + d * (t * t) + e * (t) + f;
     }
+
 }
