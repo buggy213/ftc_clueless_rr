@@ -1,4 +1,4 @@
-include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning'
+include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning', ':pathcreation-plugin'
 include ':TeamCode'
 include ':openCVLibrary3'
 include ':endercv'
