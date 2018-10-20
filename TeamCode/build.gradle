@@ -13,3 +13,15 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
+
+// beginning of the file
+
+repositories {
+    // other repositories
+    jcenter()
+}
+
+dependencies {
+    // other dependencies
+    implementation 'com.acmerobotics.roadrunner:core:0.2.1'
+}
