@@ -40,7 +40,6 @@ dependencies {
     implementation (name: 'FtcCommon-release', ext: 'aar')
     implementation (name: 'WirelessP2p-release', ext:'aar')
     implementation (name: 'Jama-1.0.3', ext: 'jar')
-    implementation project (':ftc-motionplanning')
     implementation 'com.android.support:appcompat-v7:23.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
