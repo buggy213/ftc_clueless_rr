@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.motionplanningtest;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.profile.MotionConstraints;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
@@ -12,41 +12,50 @@ import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
+
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveBase;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveREV;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /*
- * This routine is designed to tune the PIDF coefficients used by the REV Expansion Hubs for closed-
+ * This routine is designed to tune the PID coefficients used by the REV Expansion Hubs for closed-
  * loop velocity control. Although it may seem unnecessary, tuning these coefficients is just as
  * important as the positional parameters. Like the other manual tuning routines, this op mode
  * relies heavily upon the dashboard. To access the dashboard, connect your computer to the RC's
  * WiFi network and navigate to https://192.168.49.1:8080/dash in your browser. Once you've
  * successfully connected, start the program, and your robot will begin moving forward and backward
  * according to a motion profile. Your job is to graph the velocity errors over time and adjust the
- * PIDF coefficients (it's highly suggested to leave F at its default value) like any normal PID
+ * PID coefficients (it's highly suggested to leave F at its default value) like any normal PID
  * controller. Once you've found a satisfactory set of gains, add them to your drive class init.
  */
 @Config
 @Autonomous
 public class DriveVelocityPIDTuner extends LinearOpMode {
-    public static PIDFCoefficients MOTOR_PIDF = new PIDFCoefficients();
+    public static PIDCoefficients MOTOR_PID = new PIDCoefficients();
     public static double DISTANCE = 72;
+
+    /*
+     * If true, the kV value is computed from the free speed determined by the manufacturer (likely
+     * an overestimate of the actual value. If false, the value from DriveConstants.kV is used.
+     */
+    public static boolean USE_THEORETICAL_KV = true;
 
     @Override
     public void runOpMode() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        SampleMecanumDriveBase drive = new SampleMecanumDriveREV(hardwareMap);
 
-        PIDFCoefficients currentCoeffs = drive.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        MOTOR_PIDF = pidfCopy(currentCoeffs);
+        PIDCoefficients currentCoeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        MOTOR_PID = pidCopy(currentCoeffs);
         dashboard.updateConfig();
 
-        RobotLog.i("Initial motor PIDF coefficients: " + MOTOR_PIDF);
+        RobotLog.i("Initial motor PID coefficients: " + MOTOR_PID);
 
         NanoClock clock = NanoClock.system();
 
@@ -58,45 +67,39 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        MotionProfile activeProfile = null;
+        MotionProfile activeProfile = new MotionProfile();
         boolean movingForwards = false;
 
         List<Double> lastWheelPositions = null;
         double lastTimestamp = 0;
         double profileStartTimestamp = clock.seconds();
 
-        while (opModeIsActive()) {
+        double maxVel = DriveConstants.rpmToVelocity(DriveConstants.MOTOR_CONFIG.getMaxRPM());
+        double kV = USE_THEORETICAL_KV ? (1.0 / maxVel) : DriveConstants.kV;
+
+        while (!isStopRequested()) {
             // update the coefficients if necessary
-            if (!pidfEquals(currentCoeffs, MOTOR_PIDF)) {
-                RobotLog.i("Updated motor PIDF coefficients: " + MOTOR_PIDF);
-                currentCoeffs = pidfCopy(MOTOR_PIDF);
-                drive.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_PIDF);
+            if (!pidEquals(currentCoeffs, MOTOR_PID)) {
+                RobotLog.i("Updated motor PID coefficients: " + MOTOR_PID);
+                currentCoeffs = pidCopy(MOTOR_PID);
+                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_PID);
             }
 
             // calculate and set the motor power
             double profileTime = clock.seconds() - profileStartTimestamp;
             double dt = profileTime - lastTimestamp;
             lastTimestamp = profileTime;
-            if (activeProfile == null || profileTime > activeProfile.duration()) {
+            if (profileTime > activeProfile.duration()) {
                 // generate a new profile
                 movingForwards = !movingForwards;
                 MotionState start = new MotionState(movingForwards ? 0 : DISTANCE, 0, 0, 0);
                 MotionState goal = new MotionState(movingForwards ? DISTANCE : 0, 0, 0, 0);
-                activeProfile = MotionProfileGenerator.generateMotionProfile(start, goal, new MotionConstraints() {
-                    @Override
-                    public double maximumVelocity(double v) {
-                        return SampleMecanumDrive.BASE_CONSTRAINTS.maximumVelocity;
-                    }
-
-                    @Override
-                    public double maximumAcceleration(double v) {
-                        return SampleMecanumDrive.BASE_CONSTRAINTS.maximumAcceleration;
-                    }
-                });
+                activeProfile = MotionProfileGenerator.generateSimpleMotionProfile(start, goal,
+                        DriveConstants.BASE_CONSTRAINTS.maximumVelocity, DriveConstants.BASE_CONSTRAINTS.maximumAcceleration);
                 profileStartTimestamp = clock.seconds();
             }
             MotionState motionState = activeProfile.get(profileTime);
-            double targetPower = SampleMecanumDrive.kV * motionState.getV();
+            double targetPower = kV * motionState.getV();
             drive.setVelocity(new Pose2d(targetPower, 0, 0));
 
             List<Double> wheelPositions = drive.getWheelPositions();
@@ -119,12 +122,12 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
         }
     }
 
-    private static boolean pidfEquals(PIDFCoefficients coeff1, PIDFCoefficients coeff2) {
-        return coeff1.p == coeff2.p && coeff1.i == coeff1.i && coeff1.d == coeff2.d &&
-                coeff1.f == coeff2.f && coeff1.algorithm == coeff2.algorithm;
+    // TODO: integrate these methods directly into the next Road Runner release
+    private static boolean pidEquals(PIDCoefficients coeff1, PIDCoefficients coeff2) {
+        return coeff1.kP == coeff2.kP && coeff1.kI == coeff1.kI && coeff1.kD == coeff2.kD;
     }
 
-    private static PIDFCoefficients pidfCopy(PIDFCoefficients coeff) {
-        return new PIDFCoefficients(coeff.p, coeff.i, coeff.d, coeff.f, coeff.algorithm);
+    private static PIDCoefficients pidCopy(PIDCoefficients coeff) {
+        return new PIDCoefficients(coeff.kP, coeff.kI, coeff.kD);
     }
 }
