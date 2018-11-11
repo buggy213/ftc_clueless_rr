@@ -1,8 +1,7 @@
 package org.clueless.motionplanning.field_positioning.field_position_modules.odometry;
 
 import org.clueless.motionplanning.field_positioning.field_position_modules.odometry.encoders.Encoder;
-import org.clueless.motionplanning.math.TwoDimensionalTransform;
-
+import org.clueless.motionplanning.field_positioning.math.TwoDimensionalTransform;
 public class Tank_Layout extends FieldPositionModule_Odometry {
 
     Encoder left;

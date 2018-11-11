@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 repositories {
     google()
+    jcenter()
+    mavenCentral()
 }
 android {
     compileSdkVersion 21

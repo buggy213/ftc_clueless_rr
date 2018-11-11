@@ -2,8 +2,8 @@ package org.clueless.motionplanning.field_positioning;
 
 import org.clueless.motionplanning.field_positioning.field_position_modules.FieldPositionModule_DistanceSensors;
 import org.clueless.motionplanning.field_positioning.field_position_modules.FieldPositionModule_Vuforia;
-import org.clueless.motionplanning.math.TwoDimensionalTransform;
-import org.clueless.motionplanning.math.Vector2;
+import org.clueless.motionplanning.field_positioning.math.TwoDimensionalTransform;
+import org.clueless.motionplanning.field_positioning.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;

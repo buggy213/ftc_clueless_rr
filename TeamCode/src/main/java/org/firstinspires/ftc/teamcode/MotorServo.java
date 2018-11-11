@@ -20,7 +20,6 @@ public class MotorServo{
     }
 
     public void update() {
-        double error =
     }
 
 

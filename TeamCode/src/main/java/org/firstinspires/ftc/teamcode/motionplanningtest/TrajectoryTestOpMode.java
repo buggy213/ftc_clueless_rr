@@ -34,7 +34,8 @@ public class TrajectoryTestOpMode extends LinearOpMode {
                 .waitFor(2)
                 .splineTo(new Pose2d(0, 40, 0))
                 .build();
-
+        telemetry.addData("Status", "ready");
+        telemetry.update();
         waitForStart();
 
         drive.followTrajectory(trajectory);

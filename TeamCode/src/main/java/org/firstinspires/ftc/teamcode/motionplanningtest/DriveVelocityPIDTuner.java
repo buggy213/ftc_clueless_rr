@@ -77,7 +77,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
             double profileTime = clock.seconds() - profileStartTimestamp;
             double dt = profileTime - lastTimestamp;
             lastTimestamp = profileTime;
-            if (profileTime > activeProfile.duration()) {
+            if (activeProfile == null || profileTime > activeProfile.duration()) {
                 // generate a new profile
                 movingForwards = !movingForwards;
                 MotionState start = new MotionState(movingForwards ? 0 : DISTANCE, 0, 0, 0);

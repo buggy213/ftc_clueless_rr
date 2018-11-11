@@ -25,7 +25,7 @@ import java.util.List;
  */
 @Config
 @Autonomous
-public abstract class FeedforwardTuningOpMode extends LinearOpMode {
+public class FeedforwardTuningOpMode extends LinearOpMode {
     private static final double EPSILON = 1e-2;
 
     public static final double MAX_POWER = 0.7;
@@ -58,7 +58,7 @@ public abstract class FeedforwardTuningOpMode extends LinearOpMode {
         telemetry.update();
 
         boolean fitIntercept = false;
-        while (opModeIsActive()) {
+        /*while (opModeIsActive()) {
             if (gamepad1.a) {
                 fitIntercept = true;
                 while (opModeIsActive() && gamepad1.a) {
@@ -72,19 +72,19 @@ public abstract class FeedforwardTuningOpMode extends LinearOpMode {
                 break;
             }
             idle();
-        }
+        }*/
 
         telemetry.log().clear();
         telemetry.log().add(String.format("Place your robot on the field with at least %.2f in of room in front", DISTANCE));
         telemetry.log().add("Press (A) to begin");
         telemetry.update();
 
-        while (opModeIsActive() && !gamepad1.a) {
+        /*while (opModeIsActive() && !gamepad1.a) {
             idle();
         }
         while (opModeIsActive() && gamepad1.a) {
             idle();
-        }
+        }*/
 
         telemetry.log().clear();
         telemetry.log().add("Running...");

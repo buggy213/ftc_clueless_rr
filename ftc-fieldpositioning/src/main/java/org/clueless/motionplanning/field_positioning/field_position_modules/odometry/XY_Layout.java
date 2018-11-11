@@ -3,7 +3,7 @@ package org.clueless.motionplanning.field_positioning.field_position_modules.odo
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.clueless.motionplanning.field_positioning.field_position_modules.odometry.encoders.Encoder;
-import org.clueless.motionplanning.math.TwoDimensionalTransform;
+import org.clueless.motionplanning.field_positioning.math.TwoDimensionalTransform;
 
 public class XY_Layout extends FieldPositionModule_Odometry {
 

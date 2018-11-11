@@ -37,18 +37,18 @@ public class SampleMecanumDrive extends MecanumDrive {
             MotorConfigurationType.getMotorType(NeveRest20Gearmotor.class);
     private static final double TICKS_PER_REV = MOTOR_CONFIG.getTicksPerRev();
 
-    public static double WHEEL_RADIUS = 2; // in
+    public static double WHEEL_RADIUS = 4; // in
     public static double GEAR_RATIO = 1; // output/input
-    public static double TRACK_WIDTH = 1; // in
+    public static double TRACK_WIDTH = 15; // in
 
     public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(20.0, 30.0, Math.PI / 2, Math.PI / 2);
 
-    public static double kV = 0;
-    public static double kA = 0;
-    public static double kStatic = 0;
+    public static double kV = 0.2;
+    public static double kA = 0.1;
+    public static double kStatic = 0.1;
 
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(1, 0, 0);
 
 
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
@@ -69,10 +69,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "forwardLeft");
+        leftRear = hardwareMap.get(DcMotorEx.class, "backLeft");
+        rightRear = hardwareMap.get(DcMotorEx.class, "forwardRight");
+        rightFront = hardwareMap.get(DcMotorEx.class, "backRight");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
