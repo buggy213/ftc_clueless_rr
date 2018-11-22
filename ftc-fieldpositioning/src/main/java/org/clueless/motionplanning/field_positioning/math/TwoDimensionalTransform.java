@@ -4,6 +4,7 @@ public class TwoDimensionalTransform {
     public Vector2 vector;
     public double angle;
 
+
     public TwoDimensionalTransform(Vector2 vector, double angle){
         this.vector = vector;
         this.angle = angle;
