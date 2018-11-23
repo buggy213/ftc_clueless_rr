@@ -61,9 +61,13 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.acmerobotics.dashboard.FtcDashboard;
 =======
 >>>>>>> upstream/master
+=======
+import com.acmerobotics.dashboard.FtcDashboard;
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeControllerImpl;
@@ -234,9 +238,13 @@ public class FtcRobotControllerActivity extends Activity
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 <<<<<<< HEAD
+<<<<<<< HEAD
     FtcDashboard.start();
 =======
 >>>>>>> upstream/master
+=======
+    FtcDashboard.start();
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
     RobotLog.onApplicationStart();  // robustify against onCreate() following onDestroy() but using the same app instance, which apparently does happen
     RobotLog.vv(TAG, "onCreate()");
     ThemedActivity.appAppThemeToActivity(getTag(), this); // do this way instead of inherit to help AppInventor
@@ -424,9 +432,13 @@ public class FtcRobotControllerActivity extends Activity
     preferencesHelper.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(sharedPreferencesListener);
     RobotLog.cancelWriteLogcatToDisk();
 <<<<<<< HEAD
+<<<<<<< HEAD
     FtcDashboard.stop();
 =======
 >>>>>>> upstream/master
+=======
+    FtcDashboard.stop();
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
   }
 
   protected void bindToService() {
@@ -603,9 +615,13 @@ public class FtcRobotControllerActivity extends Activity
       }
     });
 <<<<<<< HEAD
+<<<<<<< HEAD
     FtcDashboard.attachWebServer(service.getWebServer());
 =======
 >>>>>>> upstream/master
+=======
+    FtcDashboard.attachWebServer(service.getWebServer());
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
   }
 
   private void updateUIAndRequestRobotSetup() {
@@ -645,10 +661,15 @@ public class FtcRobotControllerActivity extends Activity
 
     passReceivedUsbAttachmentsToEventLoop();
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     FtcDashboard.attachEventLoop(eventLoop);
 =======
 >>>>>>> upstream/master
+=======
+
+    FtcDashboard.attachEventLoop(eventLoop);
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
   }
 
   protected OpModeRegister createOpModeRegister() {

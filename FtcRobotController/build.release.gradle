@@ -6,7 +6,11 @@ dependencies {
     implementation (name:'FtcCommon-release', ext: 'aar')
     implementation (name:'WirelessP2p-release', ext:'aar')
 <<<<<<< HEAD
+<<<<<<< HEAD
     implementation project(':FtcDashboard')
 =======
 >>>>>>> upstream/master
+=======
+    implementation project(':FtcDashboard')
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 }

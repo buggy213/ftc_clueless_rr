@@ -14,6 +14,9 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 
 // beginning of the file
 
@@ -28,6 +31,10 @@ dependencies {
     implementation 'com.acmerobotics.roadrunner:core:0.2.2'
     implementation project(path: ':FtcDashboard')
     implementation 'org.openftc:rev-extensions-2:1.0'
+<<<<<<< HEAD
 }
 =======
 >>>>>>> upstream/master
+=======
+}
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76

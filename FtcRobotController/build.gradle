@@ -20,17 +20,23 @@ android {
 
 repositories {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
     mavenLocal()
     flatDir {
         dirs '../libs'
     }
     google()
     jcenter()
+<<<<<<< HEAD
 =======
     flatDir {
         dirs '../libs'
     }
 >>>>>>> upstream/master
+=======
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 }
 
 apply from: 'build.release.gradle'

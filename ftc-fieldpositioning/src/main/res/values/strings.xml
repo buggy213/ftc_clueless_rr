@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 <resources>
     <string name="app_name">ftc-fieldpositioning</string>
 </resources>
+=======
+<resources>
+    <string name="app_name">ftc-fieldpositioning</string>
+</resources>
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76

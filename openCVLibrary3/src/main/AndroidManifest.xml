@@ -5,7 +5,10 @@
       android:versionName="3.4.3">
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="21" />
 >>>>>>> upstream/master
+=======
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 </manifest>

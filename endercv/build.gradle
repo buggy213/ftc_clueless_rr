@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 repositories {
     google()
     jcenter()
@@ -7,6 +10,7 @@ repositories {
         url "https://jitpack.io"
     }
 }
+<<<<<<< HEAD
 android {
     compileSdkVersion 23
     buildToolsVersion '28.0.3'
@@ -16,6 +20,11 @@ android {
     compileSdkVersion 23
     buildToolsVersion '27.0.3'
 >>>>>>> upstream/master
+=======
+android {
+    compileSdkVersion 23
+    buildToolsVersion '28.0.3'
+>>>>>>> 2a1ab95431ea035c864851abf465519e0a67cd76
 
     defaultConfig {
         minSdkVersion 19
