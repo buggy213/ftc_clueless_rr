@@ -34,8 +34,13 @@ android {
 
     defaultConfig {
         applicationId 'com.qualcomm.ftcrobotcontroller'
+<<<<<<< HEAD
         minSdkVersion 21
         targetSdkVersion 26
+=======
+        minSdkVersion 19
+        targetSdkVersion 19
+>>>>>>> upstream/master
 
         /**
          * We keep the versionCode and versionName of robot controller applications in sync with
@@ -98,6 +103,7 @@ android {
 }
 
 repositories {
+<<<<<<< HEAD
     mavenLocal()
     flatDir {
         dirs rootProject.file('libs')
@@ -111,5 +117,10 @@ allprojects {
         mavenLocal()
         jcenter()
     }
+=======
+    flatDir {
+        dirs rootProject.file('libs')
+    }
+>>>>>>> upstream/master
 }
 apply from: 'build.release.gradle'

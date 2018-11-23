@@ -4,4 +4,8 @@
       android:versionCode="3430"
       android:versionName="3.4.3">
 
+<<<<<<< HEAD
+=======
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="21" />
+>>>>>>> upstream/master
 </manifest>

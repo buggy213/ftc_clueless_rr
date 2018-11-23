@@ -60,7 +60,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+<<<<<<< HEAD
 import com.acmerobotics.dashboard.FtcDashboard;
+=======
+>>>>>>> upstream/master
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeControllerImpl;
@@ -230,7 +233,10 @@ public class FtcRobotControllerActivity extends Activity
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+<<<<<<< HEAD
     FtcDashboard.start();
+=======
+>>>>>>> upstream/master
     RobotLog.onApplicationStart();  // robustify against onCreate() following onDestroy() but using the same app instance, which apparently does happen
     RobotLog.vv(TAG, "onCreate()");
     ThemedActivity.appAppThemeToActivity(getTag(), this); // do this way instead of inherit to help AppInventor
@@ -417,7 +423,10 @@ public class FtcRobotControllerActivity extends Activity
 
     preferencesHelper.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(sharedPreferencesListener);
     RobotLog.cancelWriteLogcatToDisk();
+<<<<<<< HEAD
     FtcDashboard.stop();
+=======
+>>>>>>> upstream/master
   }
 
   protected void bindToService() {
@@ -593,7 +602,10 @@ public class FtcRobotControllerActivity extends Activity
         return service.getRobot().eventLoopManager;
       }
     });
+<<<<<<< HEAD
     FtcDashboard.attachWebServer(service.getWebServer());
+=======
+>>>>>>> upstream/master
   }
 
   private void updateUIAndRequestRobotSetup() {
@@ -632,8 +644,11 @@ public class FtcRobotControllerActivity extends Activity
     controllerService.setupRobot(eventLoop, idleLoop, runOnComplete);
 
     passReceivedUsbAttachmentsToEventLoop();
+<<<<<<< HEAD
 
     FtcDashboard.attachEventLoop(eventLoop);
+=======
+>>>>>>> upstream/master
   }
 
   protected OpModeRegister createOpModeRegister() {

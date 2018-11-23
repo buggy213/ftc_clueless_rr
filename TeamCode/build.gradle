@@ -13,6 +13,7 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
+<<<<<<< HEAD
 
 // beginning of the file
 
@@ -28,3 +29,5 @@ dependencies {
     implementation project(path: ':FtcDashboard')
     implementation 'org.openftc:rev-extensions-2:1.0'
 }
+=======
+>>>>>>> upstream/master

@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning', ':pathcreation-plugin'
 include ':FtcDashboard'
+=======
+include ':FtcRobotController', ':clueless-motion-planning', ':ftc-motionplanning'
+>>>>>>> upstream/master
 include ':TeamCode'
 include ':openCVLibrary3'
 include ':endercv'
