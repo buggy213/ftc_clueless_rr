@@ -1,0 +1,5 @@
+include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning', ':pathcreation-plugin'
+include ':FtcDashboard'
+include ':TeamCode'
+include ':openCVLibrary3'
+include ':endercv'
