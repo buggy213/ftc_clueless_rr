@@ -29,9 +29,10 @@ repositories {
         dirs rootProject.file('libs')
     }
 
+    google()
     jcenter()
     mavenCentral()
-    google()
+
 }
 
 dependencies {
