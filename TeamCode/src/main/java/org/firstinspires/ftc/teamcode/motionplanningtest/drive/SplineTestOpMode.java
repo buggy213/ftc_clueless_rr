@@ -26,6 +26,8 @@ public class SplineTestOpMode extends LinearOpMode {
                 .splineTo(new Pose2d(0, 0, 0))
                 .build();
 
+
+
         waitForStart();
 
         if (isStopRequested()) return;

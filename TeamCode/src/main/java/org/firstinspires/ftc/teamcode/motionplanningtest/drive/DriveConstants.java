@@ -27,10 +27,10 @@ public class DriveConstants {
     private static final double TICKS_PER_REV = MOTOR_CONFIG.getTicksPerRev();
 
     public static double WHEEL_RADIUS = 2; // in
-    public static double GEAR_RATIO = 1; // output/input
-    public static double TRACK_WIDTH = 1; // in
+    public static double GEAR_RATIO = 0.66666; // output/input
+    public static double TRACK_WIDTH = 11; // in
 
-    public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(30.0, 30.0, Math.PI / 2, Math.PI / 2);
+    public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(24, 12, Math.PI / 2, Math.PI / 2);
 
     public static double kV = 0;
     public static double kA = 0;

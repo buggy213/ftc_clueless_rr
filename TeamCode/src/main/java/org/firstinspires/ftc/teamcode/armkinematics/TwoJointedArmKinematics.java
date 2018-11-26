@@ -10,7 +10,7 @@ public class TwoJointedArmKinematics {
         this.length2 = length2;
     }
 
-    public double[] inverseKinematics(double xe, double ye, double angle) {
+    public double[] inverseKinematics(double xe, double ye) {
         double a = (Math.pow(xe, 2)) + Math.pow(ye, 2) - Math.pow(length1, 2) - Math.pow(length2, 2);
         double theta2 = Math.acos(a / (2 * length1 * length2));
         double theta1 = signedAtan(xe, ye) - Math.atan((length2 * Math.sin(theta2)) / (length1 + length2 * Math.cos(theta2)));
