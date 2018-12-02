@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -30,10 +32,18 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
     private List<ExpansionHubMotor> motors;
     private BNO055IMU imu;
 
+    private double offset;
+
     PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0, 50);
 
     public RoverRuckusMecanumDriveREVOptimized(HardwareMap hardwareMap) {
+        this(hardwareMap, 0);
+    }
+
+    public RoverRuckusMecanumDriveREVOptimized(HardwareMap hardwareMap, double offset) {
         super();
+
+        this.offset = offset;
 
         RevExtensions2.init();
 
@@ -105,6 +115,13 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.addLine("Gyro: " + getExternalHeading());
+        packet.addLine("v: " + v);
+        packet.addLine("v1: " + v1);
+        packet.addLine("v2: " + v2);
+        packet.addLine("v3: " + v3);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
         leftFront.setPower(v);
         leftRear.setPower(v1);
         rightRear.setPower(v2);
@@ -113,6 +130,10 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
 
     @Override
     public double getExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return positiveModulo(imu.getAngularOrientation().firstAngle + offset, 2 * Math.PI);
+    }
+
+    public double positiveModulo(double a, double b) {
+        return ((a % b) + b) % b;
     }
 }
