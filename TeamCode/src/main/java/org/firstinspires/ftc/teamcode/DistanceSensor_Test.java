@@ -47,7 +47,7 @@ public class DistanceSensor_Test extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        RobotHardware rw = new RobotHardware(hardwareMap)
+        RobotHardware rw = new RobotHardware(hardwareMap);
 
         FourWheelMecanumDrivetrain drivetrain = new FourWheelMecanumDrivetrain(rw);
 

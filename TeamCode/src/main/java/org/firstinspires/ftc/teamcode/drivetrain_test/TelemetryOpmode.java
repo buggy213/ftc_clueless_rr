@@ -59,7 +59,7 @@ public class TelemetryOpmode extends LinearOpMode {
 
     // Constants for teleop
     final double turnSpeed = 0.6;
-    final double slowSpeed = 0.4; // 0.8
+    final double slowSpeed = 0.8; // 0.8
 
     boolean hanging;
 

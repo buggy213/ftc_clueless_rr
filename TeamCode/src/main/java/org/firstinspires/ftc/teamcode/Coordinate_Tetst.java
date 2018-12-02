@@ -14,6 +14,7 @@ public class Coordinate_Tetst {
     double a = 32.31;
     double b = 60.64;
     double c = 72.20;
+    double d = 23.21;
 
     public void calcDistance1() {
 

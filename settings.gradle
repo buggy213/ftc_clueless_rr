@@ -1,4 +1,4 @@
-include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning', ':pathcreation-plugin'
+include ':FtcRobotController', ':ftc-motionplanning', ':ftc-fieldpositioning', ':pathcreation-plugin', ':tensorflow-lite-0.0.0-nightly'
 include ':FtcDashboard'
 include ':TeamCode'
 include ':openCVLibrary3'
