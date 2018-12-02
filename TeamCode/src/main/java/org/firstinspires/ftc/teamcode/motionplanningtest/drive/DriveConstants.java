@@ -28,11 +28,13 @@ public class DriveConstants {
 
     public static double WHEEL_RADIUS = 2; // in
     public static double GEAR_RATIO = 0.66666; // output/input
+
+    // TODO figure out why track width calibration outputs 0.51
     public static double TRACK_WIDTH = 11; // in
 
     public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(24, 12, Math.PI / 2, Math.PI / 2);
 
-    public static double kV = 0;
+    public static double kV = 0.02682;
     public static double kA = 0;
     public static double kStatic = 0;
 

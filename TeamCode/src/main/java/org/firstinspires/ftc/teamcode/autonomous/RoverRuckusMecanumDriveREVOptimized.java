@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
@@ -29,25 +32,35 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
     private List<ExpansionHubMotor> motors;
     private BNO055IMU imu;
 
+    private double offset;
+
+    PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0, 50);
+
     public RoverRuckusMecanumDriveREVOptimized(HardwareMap hardwareMap) {
+        this(hardwareMap, 0);
+    }
+
+    public RoverRuckusMecanumDriveREVOptimized(HardwareMap hardwareMap, double offset) {
         super();
+
+        this.offset = offset;
 
         RevExtensions2.init();
 
         // TODO: adjust the names of the following hardware devices to match your configuration
         // for simplicity, we assume that the desired IMU and drive motors are on the same hub
         // note: this strategy is still applicable even if the drive motors are split between hubs
-        hub = hardwareMap.get(ExpansionHubEx.class, "hub");
+        hub = hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
 
         imu = LynxOptimizedI2cFactory.createLynxEmbeddedImu(hub.getStandardModule(), 0);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(ExpansionHubMotor.class, "leftFront");
-        leftRear = hardwareMap.get(ExpansionHubMotor.class, "leftRear");
-        rightRear = hardwareMap.get(ExpansionHubMotor.class, "rightRear");
-        rightFront = hardwareMap.get(ExpansionHubMotor.class, "rightFront");
+        leftFront = hardwareMap.get(ExpansionHubMotor.class, "frontLeft");
+        leftRear = hardwareMap.get(ExpansionHubMotor.class, "backLeft");
+        rightRear = hardwareMap.get(ExpansionHubMotor.class, "backRight");
+        rightFront = hardwareMap.get(ExpansionHubMotor.class, "frontRight");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -60,9 +73,12 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: set the tuned coefficients from DriveVelocityPIDTuner if using RUN_USING_ENCODER
         // setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, ...);
+        // setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidCoefficients);
     }
 
     @Override
@@ -85,14 +101,27 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
     public List<Double> getWheelPositions() {
         RevBulkData bulkData = hub.getBulkInputData();
         List<Double> wheelPositions = new ArrayList<>();
+        boolean bulkDataExists = bulkData != null;
         for (ExpansionHubMotor motor : motors) {
-            wheelPositions.add(DriveConstants.encoderTicksToInches(bulkData.getMotorCurrentPosition(motor)));
+            if (bulkDataExists) {
+                wheelPositions.add(DriveConstants.encoderTicksToInches(bulkData.getMotorCurrentPosition(motor)));
+            }
+            else {
+                wheelPositions.add(0d);
+            }
         }
         return wheelPositions;
     }
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.addLine("Gyro: " + getExternalHeading());
+        packet.addLine("v: " + v);
+        packet.addLine("v1: " + v1);
+        packet.addLine("v2: " + v2);
+        packet.addLine("v3: " + v3);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
         leftFront.setPower(v);
         leftRear.setPower(v1);
         rightRear.setPower(v2);
@@ -101,6 +130,10 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
 
     @Override
     public double getExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return positiveModulo(imu.getAngularOrientation().firstAngle + offset, 2 * Math.PI);
+    }
+
+    public double positiveModulo(double a, double b) {
+        return ((a % b) + b) % b;
     }
 }

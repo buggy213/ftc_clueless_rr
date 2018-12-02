@@ -89,7 +89,7 @@ public class ArmController {
 
 
         telemetry.addData("first joint error", firstJointError);
-        telemetry.addData("first joint error", secondJointError);
+        telemetry.addData("second joint error", secondJointError);
         boolean retFlag = false;
         if (firstJointError == 0 && secondJointError == 0) {
             robotHardware.firstJoint.setPower(0);

@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptimized;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,25 +42,26 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
      * an overestimate of the actual value. If false, the value from DriveConstants.kV is used.
      */
     public static boolean USE_THEORETICAL_KV = true;
-
+    public String formatCoefficients(PIDCoefficients a) {
+        return "P: " + a.kP + " I: " + a.kI + " D: " + a.kD;
+    }
     @Override
     public void runOpMode() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        SampleMecanumDriveBase drive = new SampleMecanumDriveREV(hardwareMap);
+        RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
         PIDCoefficients currentCoeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         MOTOR_PID = pidCopy(currentCoeffs);
         dashboard.updateConfig();
 
-        RobotLog.i("Initial motor PID coefficients: " + MOTOR_PID);
+        RobotLog.i("Initial motor PID coefficients: " + formatCoefficients(MOTOR_PID));
 
         NanoClock clock = NanoClock.system();
 
         telemetry.log().add("Ready!");
         telemetry.update();
         telemetry.clearAll();
-        msStuckDetectLoop = 32000000;
         waitForStart();
 
         if (isStopRequested()) return;

@@ -61,6 +61,8 @@ public class TelemetryOpmode extends LinearOpMode {
     final double turnSpeed = 0.6;
     final double slowSpeed = 0.4; // 0.8
 
+    boolean hanging;
+
     boolean turningTowards = false;
 
     double previousTimeStamp = 0;
@@ -82,8 +84,8 @@ public class TelemetryOpmode extends LinearOpMode {
 
         drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rw.frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        rw.backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        rw.frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        rw.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -128,8 +130,22 @@ public class TelemetryOpmode extends LinearOpMode {
             telemetry.addData("BL", drivetrain.rw.backLeft.getCurrentPosition());
 
             //endregion
+            if (gamepad2.b) {
+                hanging = true;
+                rw.linearSlider.setTargetPosition(rw.linearSlider.getTargetPosition());
+                rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rw.linearSlider.setPower(1);
+            }
+            if (gamepad2.a) {
+                rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                rw.linearSlider.setPower(0);
+                hanging = false;
+            }
 
-            rw.linearSlider.setPower(gamepad2.right_stick_y);
+            if (!hanging) {
+                rw.linearSlider.setPower(gamepad2.right_stick_y);
+            }
+
 
             armController.updateArm(gamepad2, deltaTime);
 

@@ -1,17 +1,22 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoController;
 
-public class MotorServo{
+public class MotorServo implements Servo{
 
 
-    DcMotor motor;
+    DcMotorEx motor;
     MotorConfiguration configuration;
     double kp, ki, kd;
     double previousError, errorSum;
 
+    public MotorServo(DcMotorEx motor, MotorConfiguration configuration) {
+        this.motor = motor;
+    }
 
     double target;
     public static class MotorConfiguration {
@@ -25,8 +30,66 @@ public class MotorServo{
         }
     }
 
+    @Override
+    public Manufacturer getManufacturer() {
+        return null;
+    }
 
-    public void setPosition(double position, boolean clockwise) {
+    public void close() {
+
+    }
+
+    @Override
+    public void resetDeviceConfigurationForOpMode() {
+
+    }
+
+    @Override
+    public void scaleRange(double min, double max) {
+
+    }
+
+    @Override
+    public ServoController getController() {
+        return null;
+    }
+
+    @Override
+    public String getDeviceName() {
+        return null;
+    }
+
+    @Override
+    public int getPortNumber() {
+        return 0;
+    }
+
+    @Override
+    public int getVersion() {
+        return 0;
+    }
+
+    @Override
+    public double getPosition() {
+        return target / configuration.encoderTicksPerRevolution;
+    }
+
+    @Override
+    public String getConnectionInfo() {
+        return null;
+    }
+
+    @Override
+    public Direction getDirection() {
+        return null;
+    }
+
+    @Override
+    public void setDirection(Direction direction) {
+
+    }
+
+    public void setPosition(double position) {
         target = position * configuration.encoderTicksPerRevolution;
         errorSum = 0;
         previousError = 0;

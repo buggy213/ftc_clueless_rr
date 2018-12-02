@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
+import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptimized;
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.SampleMecanumDriveBase;
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.SampleMecanumDriveREV;
@@ -34,7 +35,7 @@ public class DriveFFTuningOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDriveBase drive = new SampleMecanumDriveREV(hardwareMap);
+        RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
 
         NanoClock clock = NanoClock.system();
 
