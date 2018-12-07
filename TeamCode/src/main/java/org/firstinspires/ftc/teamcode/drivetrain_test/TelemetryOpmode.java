@@ -84,8 +84,8 @@ public class TelemetryOpmode extends LinearOpMode {
 
         drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rw.frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        rw.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        rw.frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        rw.backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

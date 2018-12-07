@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.motionplanningtest.util;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 

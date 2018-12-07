@@ -26,8 +26,8 @@ import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptim
 @Config
 @Autonomous
 public class NewTrackWidthCalibrationOpMode extends LinearOpMode {
-    public static int CIRCUMFERENTIAL_DISTANCE = 500;
-    public static int NUM_TRIALS = 5;
+    public static int CIRCUMFERENTIAL_DISTANCE = 200;
+    public static int NUM_TRIALS = 1;
 
     @Override
     public void runOpMode() throws InterruptedException {

@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name="Select Parameters")
 public class SelectParameters extends LinearOpMode {
     public class Parameters {
-        public StartingPosition startingPosition = StartingPosition.BLUE_FACING_DEPOT;
 
+        public StartingPosition startingPosition = StartingPosition.RED_FACING_DEPOT;
         //TODO vision
         public SamplingPosition mineralConfiguration = SamplingPosition.CENTER;
 
@@ -17,8 +17,8 @@ public class SelectParameters extends LinearOpMode {
             return startingPosition.name() + mineralConfiguration.name();
         }
     }
-
     public static Parameters matchParameters;
+
 
     // Position of gold mineral in sampling field
     enum SamplingPosition {
@@ -28,10 +28,10 @@ public class SelectParameters extends LinearOpMode {
 
     // TODO refine starting locations
     enum StartingPosition {
-        RED_FACING_CRATER (new Pose2d(new Vector2d(-12, -12), -45)),
-        RED_FACING_DEPOT (new Pose2d(new Vector2d(12, -12), 45)),
-        BLUE_FACING_CRATER (new Pose2d(new Vector2d(12, 12), 135)),
-        BLUE_FACING_DEPOT (new Pose2d(new Vector2d(-12, 12), 315));
+        RED_FACING_CRATER (new Pose2d(new Vector2d(-12, -12), 0)),
+        RED_FACING_DEPOT (new Pose2d(new Vector2d(12, -12), 0)),
+        BLUE_FACING_CRATER (new Pose2d(new Vector2d(12, 12), 0)),
+        BLUE_FACING_DEPOT (new Pose2d(new Vector2d(-12, 12), 0));
 
         public final Pose2d startingPosition;
         StartingPosition(Pose2d startingPosition) {
@@ -55,5 +55,13 @@ public class SelectParameters extends LinearOpMode {
             telemetry.addData("Starting Position", matchParameters);
             telemetry.update();
         }
+    }
+
+    public Parameters initalize(){
+        if (matchParameters == null) {
+            matchParameters = new Parameters();
+        }
+
+        return matchParameters;
     }
 }

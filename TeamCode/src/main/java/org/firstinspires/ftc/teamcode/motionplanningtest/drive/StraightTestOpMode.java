@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptimized;
-import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.motionplanningtest.util.DashboardUtil;
 
 /*
  * This is a simple routine to test translational drive capabilities. If this is *consistently*
@@ -23,7 +23,7 @@ public class StraightTestOpMode extends LinearOpMode {
         RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
 
         Trajectory trajectory = drive.trajectoryBuilder()
-                .forward(60)
+                .forward(48)
                 .build();
 
         waitForStart();

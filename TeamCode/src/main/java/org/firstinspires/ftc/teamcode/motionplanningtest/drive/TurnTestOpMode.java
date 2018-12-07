@@ -9,8 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptimized;
-import org.firstinspires.ftc.teamcode.util.DashboardUtil;
-
+import org.firstinspires.ftc.teamcode.motionplanningtest.util.DashboardUtil;
 /*
  * This is a simple routine to test turning capabilities. If this is consistently overshooting or
  * undershooting by a significant amount, re-run TrackWidthCalibrationOpMode.

@@ -369,10 +369,7 @@ public class FourWheelMecanumDrivetrain {
     public void displayInformation() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("BL", rw.backLeft.getVelocity(AngleUnit.DEGREES));
-        packet.put("BR", rw.backRight.getVelocity(AngleUnit.DEGREES));
-        packet.put("FL", rw.frontLeft.getVelocity(AngleUnit.DEGREES));
-        packet.put("FR", rw.frontRight.getVelocity(AngleUnit.DEGREES));
+
         dashboard.sendTelemetryPacket(packet);
     }
 

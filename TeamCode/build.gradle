@@ -21,6 +21,7 @@ repositories {
     // other repositories
     mavenLocal()
     jcenter()
+    google()
 }
 
 dependencies {
@@ -28,4 +29,6 @@ dependencies {
     implementation 'com.acmerobotics.roadrunner:core:0.2.3'
     implementation project(path: ':FtcDashboard')
     implementation 'org.openftc:rev-extensions-2:1.1'
+    implementation project(path: ':openCVLibrary3')
+    compile project(path: ':endercv')
 }

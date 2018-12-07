@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptim
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.SampleMecanumDriveBase;
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.SampleMecanumDriveREV;
-import org.firstinspires.ftc.teamcode.util.TuningUtil;
+import org.firstinspires.ftc.teamcode.motionplanningtest.util.TuningUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
 @Autonomous
 public class DriveFFTuningOpMode extends LinearOpMode {
     public static final double MAX_POWER = 0.7;
-    public static final double DISTANCE = 100;
+    public static final double DISTANCE = 24;
 
     @Override
     public void runOpMode() throws InterruptedException {
