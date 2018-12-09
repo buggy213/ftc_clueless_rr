@@ -8,12 +8,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MotorServo;
 
 public class RobotHardware {
-        public DcMotorEx backLeft, backRight, frontLeft, frontRight, linearSlider, firstJoint, secondJoint;
+        public DcMotorEx backLeft, backRight, frontLeft, frontRight, linearSlider, firstJoint, secondJoint, intake;
 
-        public Servo samplingServo;
+        public Servo samplingServo, intakeJoint, pawServo, sorterPivot, door;
         public MotorServo firstJointVirtualServo, secondJointVirtualServo;
 
-        public RobotHardware(HardwareMap hwMap) {
+
+    public RobotHardware(HardwareMap hwMap) {
             backLeft = (DcMotorEx)hwMap.get(DcMotor.class, "backLeft");
             backRight = (DcMotorEx)hwMap.get(DcMotor.class, "backRight");
             frontLeft = (DcMotorEx)hwMap.get(DcMotor.class,"frontLeft");
@@ -21,13 +22,16 @@ public class RobotHardware {
             linearSlider = (DcMotorEx)hwMap.get(DcMotor.class, "linearSlider");
             firstJoint = (DcMotorEx)hwMap.get(DcMotor.class, "firstJoint");
             secondJoint = (DcMotorEx)hwMap.get(DcMotor.class, "secondJoint");
+            intake = (DcMotorEx)hwMap.get(DcMotor.class, "intake");
 
             samplingServo = hwMap.get(Servo.class, "samplingServo");
+            intakeJoint = hwMap.get(Servo.class, "intakeJoint");
+            pawServo = hwMap.get(Servo.class, "pawServo");
+            sorterPivot = hwMap.get(Servo.class, "sorterPivot");
+            door = hwMap.get(Servo.class, "door");
 
             firstJointVirtualServo = new MotorServo(firstJoint, MotorServo.MotorConfiguration.firstJoint);
             secondJointVirtualServo = new MotorServo(secondJoint, MotorServo.MotorConfiguration.secondJoint);
-
-
         }
 
         public void resetEncoders() throws InterruptedException{

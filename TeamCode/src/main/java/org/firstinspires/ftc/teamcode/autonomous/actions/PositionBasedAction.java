@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.autonomous.actions;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.drive.Drive;
+
+import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptimized;
 
 public class PositionBasedAction implements Action {
 
     double maxDistance;
     Vector2d startPos, endPos;
-    Drive drive;
+    RoverRuckusMecanumDriveREVOptimized drive;
 
-    public PositionBasedAction(Vector2d startPos, Vector2d endPos, Drive drive, double maxDistance) {
+    public PositionBasedAction(Vector2d startPos, Vector2d endPos, RoverRuckusMecanumDriveREVOptimized drive, double maxDistance) {
         this.startPos = startPos;
         this.endPos = endPos;
         this.drive = drive;
@@ -44,5 +47,9 @@ public class PositionBasedAction implements Action {
     @Override
     public void stop() {
 
+    }
+
+    private Pose2d getTheoreticalPosition() {
+        return drive.getPoseEstimate().minus(drive.getFollowingError());
     }
 }

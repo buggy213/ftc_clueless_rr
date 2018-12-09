@@ -38,6 +38,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.armkinematics.ArmController;
 import org.firstinspires.ftc.teamcode.drivetrain_test.FourWheelMecanumDrivetrain;
 
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.DOOR_BLOCK;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.DOOR_RELEASED;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_COLLECT;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_DOWN;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_UP;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_SPEED;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.LOCK_DISENGAGED;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.LOCK_ENGAGED;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.SORTER_OUT;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.SORTER_TUCKED;
+
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -61,9 +72,14 @@ public class TelemetryOpmode extends LinearOpMode {
     final double turnSpeed = 0.6;
     final double slowSpeed = 0.8; // 0.8
 
-    boolean hanging;
-
     boolean turningTowards = false;
+    boolean manualArmControl = true;
+
+    boolean door, intake;
+    boolean doorToggle, intakeToggle;
+
+    int armControlMode = 0;
+    int intakeMode = 1;
 
     double previousTimeStamp = 0;
 
@@ -74,7 +90,10 @@ public class TelemetryOpmode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         RobotHardware rw = new RobotHardware(hardwareMap);
 
-        armController = new ArmController(rw, telemetry);
+        boolean back = false;
+
+        armController = new ArmController(rw, telemetry, true);
+        if (manualArmControl) armController.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         drivetrain = new FourWheelMecanumDrivetrain(rw);
 
         drivetrain.setMotorZeroPower(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -129,26 +148,82 @@ public class TelemetryOpmode extends LinearOpMode {
 
             telemetry.addData("BL", drivetrain.rw.backLeft.getCurrentPosition());
 
+            telemetry.addData("Linear Slider Position", rw.linearSlider.getCurrentPosition());
+
             //endregion
             if (gamepad2.b) {
-                hanging = true;
-                rw.linearSlider.setTargetPosition(rw.linearSlider.getTargetPosition());
-                rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rw.linearSlider.setPower(1);
+                rw.pawServo.setPosition(LOCK_ENGAGED);
             }
             if (gamepad2.a) {
-                rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                rw.linearSlider.setPower(0);
-                hanging = false;
+                rw.pawServo.setPosition(LOCK_DISENGAGED);
             }
 
-            if (!hanging) {
-                rw.linearSlider.setPower(gamepad2.right_stick_y);
+            if (gamepad2.back && !back) {
+                manualArmControl = !manualArmControl;
             }
 
+            if (gamepad1.left_bumper) {
+                rw.sorterPivot.setPosition(SORTER_TUCKED);
+            }
 
-            armController.updateArm(gamepad2, deltaTime);
+            if (gamepad1.right_bumper) {
+                rw.sorterPivot.setPosition(SORTER_OUT);
+            }
 
+            if (gamepad1.b && !door) {
+                doorToggle = !doorToggle;
+            }
+
+            if (gamepad1.a && !intake) {
+                intakeToggle = !intakeToggle;
+            }
+
+            if (gamepad2.x) {
+                rw.intakeJoint.setPosition(INTAKE_JOINT_COLLECT);
+            }
+
+            if (gamepad2.y) {
+                rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
+            }
+
+            if (doorToggle) {
+                rw.door.setPosition(DOOR_BLOCK);
+            }
+            else {
+                rw.door.setPosition(DOOR_RELEASED);
+            }
+
+            if (gamepad1.y) {
+                intakeMode = 2;
+            }
+            else if (gamepad1.x){
+                intakeMode = 1;
+            }
+            else if (gamepad1.a) {
+                intakeMode = 0;
+            }
+
+            switch (intakeMode) {
+                case 0:
+                    rw.intake.setPower(INTAKE_SPEED);
+                    break;
+                case 1:
+                    rw.intake.setPower(0);
+                    break;
+                case 2:
+                    rw.intake.setPower(-INTAKE_SPEED);
+                    break;
+            }
+            door = gamepad1.b;
+            back = gamepad2.back;
+
+            rw.linearSlider.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
+            if (manualArmControl) {
+                armController.manualArmControl(gamepad2);
+            }
+            else {
+                armController.updateArmTeleop(gamepad2, deltaTime);
+            }
             telemetry.update();
 
             previousTimeStamp = runtime.milliseconds();

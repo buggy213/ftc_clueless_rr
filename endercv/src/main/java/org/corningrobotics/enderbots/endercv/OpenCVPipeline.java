@@ -56,6 +56,8 @@ public abstract class OpenCVPipeline implements CameraBridgeViewBase.CvCameraVie
     private boolean initStarted = false;
     private boolean inited = false;
 
+    Mat rgba = new Mat();
+    Mat gray = new Mat();
     /**
      * Initializes the OpenCVPipeline, but implicitly uses the rear camera.
      * @param context the application context, usually hardwareMap.appContext
@@ -155,8 +157,6 @@ public abstract class OpenCVPipeline implements CameraBridgeViewBase.CvCameraVie
      */
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Mat rgba = new Mat();
-        Mat gray = new Mat();
         switch (((Activity) context).getWindowManager().getDefaultDisplay().getRotation()) {
             case Surface.ROTATION_0:
                 // this breaks horribly for some reason
