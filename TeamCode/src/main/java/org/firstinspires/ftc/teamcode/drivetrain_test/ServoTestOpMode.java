@@ -13,30 +13,35 @@ public class ServoTestOpMode extends LinearOpMode {
     int index = 0;
     double speed = 0.05;
     ElapsedTime elapsedTime = new ElapsedTime();
-
+    RobotHardware rw;
     boolean a, b;
     @Override
     public void runOpMode() {
-        List<Servo> servos = hardwareMap.getAll(Servo.class);
+        rw = new RobotHardware(hardwareMap);
+        Servo[] servos = new Servo[]{
+            rw.samplingServo,
+                rw.pawServo,
+                rw.intakeJoint,
+                rw.sorterPivot,
+                rw.door
+        };//hardwareMap.getAll(Servo.class);
 
-
-        String[] servoNamesTempArray = new String[servos.size()];
         List<String> servoNames = new ArrayList<>();
         List<Double> servoPositions = new ArrayList<>();
         for (Servo s : servos) {
-            servoPositions.add(0d);
-            hardwareMap.getNamesOf(s).toArray(servoNamesTempArray);
+            servoPositions.add(0.5);
+            servoNames.add(hardwareMap.getNamesOf(s).iterator().next());
         }
 
-        servoNames.addAll(Arrays.asList(servoNamesTempArray));
+
         // specifically for this year
-        RobotHardware rw = new RobotHardware(hardwareMap);
+        /*RobotHardware rw = new RobotHardware(hardwareMap);
         servos.add(rw.firstJointVirtualServo);
         servos.add(rw.secondJointVirtualServo);
         servoNames.add("First Joint Virtual Servo");
         servoNames.add("Second Joint Virtual Servo");
         servoPositions.add(0d);
-        servoPositions.add(0d);
+        servoPositions.add(0d);*/
 
 
         waitForStart();
@@ -50,17 +55,17 @@ public class ServoTestOpMode extends LinearOpMode {
                 index--;
             }
 
-            index = ((index % servos.size() + servos.size()) % servos.size());
+            index = ((index % servos.length + servos.length) % servos.length);
             a = gamepad1.a;
             b = gamepad1.b;
-            servos.get(index).setPosition(servoPositions.get(index));
+            servos[index].setPosition(servoPositions.get(index));
             double deltaTime = (elapsedTime.milliseconds() - previousTime) / 1000;
             previousTime = elapsedTime.milliseconds();
 
             double newPosition = servoPositions.get(index) + gamepad1.left_stick_y * deltaTime * speed;
             servoPositions.set(index, newPosition);
 
-            telemetry.addData("Number of servos: ", servos.size());
+            telemetry.addData("Number of servos: ", servos.length);
             telemetry.addData("Name of selected servo: ", servoNames.get(index));
             telemetry.addData("Servo position", servoPositions.get(index));
             telemetry.update();

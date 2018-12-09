@@ -22,6 +22,10 @@ public class TwoJointedArmKinematics {
         double theta1 = signedAtan(xe, ye) - Math.atan((length2 * Math.sin(theta2)) / (length1 + length2 * Math.cos(theta2)));
         double secondtheta2 = -theta2;
         double secondtheta1 = theta1 + theta2;
+        if (theta1 == 0) {
+            double k = 1;
+        }
+
         return new double[] {
                 theta1,
                 theta2,

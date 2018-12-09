@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.autonomous.actions;
 
 import org.firstinspires.ftc.teamcode.drivetrain_test.RobotHardware;
 
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.SAMPLING_SERVO_DOWN;
+import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.SAMPLING_SERVO_UP;
+
 public class SamplingArmAction extends TimeBasedAction {
 
-    final double SAMPLING_SERVO_UP = 1;
-    final double SAMPLING_SERVO_DOWN = 0.55;
+
 
     RobotHardware rw;
 
