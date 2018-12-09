@@ -107,6 +107,7 @@ public class Autonomous extends LinearOpMode {
             drive.followTrajectory(trajectory);
             waitForTrajectoryFinish(drive, trajectory);
 
+
             builder = freshTrajectoryBuilder(drive);
 
             switch(matchParameters.startingPosition) {
