@@ -22,4 +22,9 @@ public class PIDController {
         previousError = error;
         return value;
     }
+
+    public void reset() {
+        previousError = 0;
+        sum = 0;
+    }
 }

@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.armkinematics;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants;
@@ -58,6 +60,8 @@ public class ArmController {
 
     PIDController firstJointPID;
     PIDController secondJointPID;
+
+    Gamepad previousGamepad;
 
     public void setEnabled(boolean enabled) {
         ArmController.enabled = enabled;
@@ -129,21 +133,119 @@ public class ArmController {
         telemetry.addData("second joint error", secondJointError);
     }
 
+    public void basicKinematicControl (Gamepad gamepad) {
+
+        if (previousGamepad == null) {
+            previousGamepad = new Gamepad();
+            try {
+                previousGamepad.copy(gamepad);
+            }
+            catch (RobotCoreException e) {
+                RobotLog.e(e.toString());
+            }
+        }
+        double firstJointError = firstJointTarget - robotHardware.firstJoint.getCurrentPosition();
+        double secondJointError = secondJointTarget - robotHardware.secondJoint.getCurrentPosition();
+
+        double firstJointPower;
+        double secondJointPower;
+
+        if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0 && gamepad.right_stick_y == 0 && previousGamepad.right_stick_y != 0) {
+            firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
+            firstJointPID.reset();
+            firstJointPower = firstJointPID.feedback(firstJointError);
+            secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
+            secondJointPID.reset();
+            secondJointPower = secondJointPID.feedback(secondJointError);
+        }
+        else if (gamepad.left_stick_y == 0 && gamepad.right_stick_y == 0) {
+            firstJointPower = firstJointPID.feedback(firstJointError);
+            secondJointPower = secondJointPID.feedback(secondJointError);
+            robotHardware.firstJoint.setPower(firstJointPower);
+            robotHardware.secondJoint.setPower(secondJointPower);
+        }
+        else {
+            double rotationComponent = gamepad.left_stick_y;
+            double lengthComponent = gamepad.right_stick_y;
+            autoScalePower(rotationComponent + lengthComponent, -2 * lengthComponent, MAX_SPEED);
+        }
+
+
+
+        try {
+            previousGamepad.copy(gamepad);
+        }
+        catch (RobotCoreException e) {
+            RobotLog.e(e.toString());
+        }
+    }
+
     public void manualArmControl(Gamepad gamepad) {
-        firstJointTarget += gamepad.left_stick_y * MANUAL_SPEED;
-        secondJointTarget += (gamepad.right_stick_y) * MANUAL_SPEED;
+
+        if (previousGamepad == null) {
+            previousGamepad = new Gamepad();
+            try {
+                previousGamepad.copy(gamepad);
+            }
+            catch (RobotCoreException e) {
+                RobotLog.e(e.toString());
+            }
+        }
 
         double firstJointError = firstJointTarget - robotHardware.firstJoint.getCurrentPosition();
         double secondJointError = secondJointTarget - robotHardware.secondJoint.getCurrentPosition();
 
-        robotHardware.firstJoint.setPower(firstJointPID.feedback(firstJointError));
-        robotHardware.secondJoint.setPower(secondJointPID.feedback(secondJointError));
+        double firstJointPower;
+        double secondJointPower;
+
+        if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0) {
+            firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
+            firstJointPID.reset();
+            firstJointPower = firstJointPID.feedback(firstJointError);
+        }
+        else if (gamepad.left_stick_y == 0){
+            firstJointPower = firstJointPID.feedback(firstJointError);
+        }
+        else {
+            firstJointPower = gamepad.left_stick_y;
+        }
+
+        if (gamepad.right_stick_y == 0 && previousGamepad.right_stick_y != 0) {
+            secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
+            secondJointPID.reset();
+            secondJointPower = secondJointPID.feedback(secondJointError);
+        }
+        else if (gamepad.left_stick_y == 0){
+            secondJointPower = secondJointPID.feedback(secondJointError);
+        }
+        else {
+            secondJointPower = gamepad.right_stick_y;
+        }
+
+
+        robotHardware.firstJoint.setPower(firstJointPower);
+        robotHardware.secondJoint.setPower(secondJointPower);
 
 
         telemetry.addData("first joint target", firstJointTarget);
         telemetry.addData("second joint target", secondJointTarget);
         telemetry.addData("first joint error", firstJointError);
         telemetry.addData("second joint error", secondJointError);
+        try {
+            previousGamepad.copy(gamepad);
+        }
+        catch (RobotCoreException e) {
+            RobotLog.e(e.toString());
+        }
+    }
+
+    void autoScalePower(double firstJointPower, double secondJointPower, double maxSpeed) {
+        double scaleFactor = Math.max(1 / maxSpeed, Math.max(Math.abs(secondJointPower) / maxSpeed, Math.abs(firstJointPower) / maxSpeed));
+        double scaledFirstJointPower = Math.min(maxSpeed, Math.abs(firstJointPower) / scaleFactor) * Math.signum(firstJointPower);
+        double scaledSecondJointPower = Math.min(maxSpeed, Math.abs(secondJointPower) / scaleFactor) * Math.signum(secondJointPower);
+        robotHardware.firstJoint.setPower(scaledFirstJointPower);
+        robotHardware.secondJoint.setPower(scaledSecondJointPower);
+
     }
 
     public void setPositions(int firstJointTarget, int secondJointTarget) {
