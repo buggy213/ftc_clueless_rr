@@ -167,7 +167,7 @@ public class ArmController {
         else {
             double rotationComponent = gamepad.left_stick_y;
             double lengthComponent = gamepad.right_stick_y;
-            autoScalePower(rotationComponent + lengthComponent, -2 * lengthComponent, MAX_SPEED);
+            autoScalePower((rotationComponent + lengthComponent) / FIRST_JOINT_GEAR_RATIO, -2 * lengthComponent / SECOND_JOINT_GEAR_RATIO, MAX_SPEED);
         }
 
 

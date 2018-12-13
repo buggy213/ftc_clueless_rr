@@ -222,7 +222,7 @@ public class TelemetryOpmode extends LinearOpMode {
                 armController.manualArmControl(gamepad2);
             }
             else {
-                armController.updateArmTeleop(gamepad2, deltaTime);
+                armController.basicKinematicControl(gamepad2);
             }
             telemetry.update();
 
