@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.teamcode.armkinematics.ArmController;
 import org.firstinspires.ftc.teamcode.drivetrain_test.FourWheelMecanumDrivetrain;
 
@@ -169,7 +170,6 @@ public class TelemetryOpmode extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 rw.sorterPivot.setPosition(SORTER_OUT);
             }
-
             if (gamepad1.b && !door) {
                 doorToggle = !doorToggle;
             }
@@ -222,7 +222,7 @@ public class TelemetryOpmode extends LinearOpMode {
                 armController.manualArmControl(gamepad2);
             }
             else {
-                armController.updateArmTeleop(gamepad2, deltaTime);
+                armController.basicKinematicControl(gamepad2);
             }
             telemetry.update();
 
