@@ -122,6 +122,7 @@ public class Autonomous extends LinearOpMode {
             drive.followTrajectory(trajectory);
             waitForTrajectoryFinish(drive, trajectory);
 
+
             builder = freshTrajectoryBuilder(drive);
 
             rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
