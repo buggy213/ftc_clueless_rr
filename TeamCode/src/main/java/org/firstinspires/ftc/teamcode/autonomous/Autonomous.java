@@ -6,99 +6,66 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.drive.Localizer;
 import com.acmerobotics.roadrunner.path.heading.ConstantInterpolator;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.corningrobotics.enderbots.endercv.CameraViewDisplay;
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.Coordinate_Tetst;
-import org.firstinspires.ftc.teamcode.armkinematics.ArmController;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.arm.armkinematics.ArmController;
 import org.firstinspires.ftc.teamcode.autonomous.actions.IntakeAction;
-import org.firstinspires.ftc.teamcode.autonomous.actions.SamplingArmAction;
-import org.firstinspires.ftc.teamcode.drivetrain_test.FourWheelMecanumDrivetrain;
-import org.firstinspires.ftc.teamcode.drivetrain_test.RobotHardware;
-import org.firstinspires.ftc.teamcode.motionplanningtest.drive.ComplementaryVuforiaLocalizer;
-import org.firstinspires.ftc.teamcode.motionplanningtest.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.motionplanningtest.util.AssetsTrajectoryLoader;
-import org.firstinspires.ftc.teamcode.motionplanningtest.util.DashboardUtil;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
+import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
+import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
+import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.TrajectoryBuilderExtended;
+import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.shared.RobotHardware;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
+import org.firstinspires.ftc.teamcode.motionplanning.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.autonomous.SelectParameters.matchParameters;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_DOWN;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_MARKER;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_UP;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.LOCK_DISENGAGED;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.LOCK_ENGAGED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Main Autonomous")
 @Config
 public class Autonomous extends LinearOpMode {
-
-    VuforiaLocalizer vuforia;
 
     public static boolean debug = false;
     public static int mineral = 0;
 
     public static int TIME_GOING_DOWN = 2800;
 
-    Map<String, Map<String, Trajectory>> trajectories;
+    private TFObjectDetector tfod;
+    private VuforiaLocalizer vuforia;
 
+    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
-    void loadTrajectories() {
-        trajectories = new HashMap<>();
-        try {
-            for (SelectParameters.StartingPosition position : SelectParameters.StartingPosition.values()) {
-                Map<String, Trajectory> subMap = new HashMap<>();
-                for (SelectParameters.SamplingPosition samplingPosition : SelectParameters.SamplingPosition.values()) {
-                    Trajectory t = AssetsTrajectoryLoader.load((position + "_" + samplingPosition).toLowerCase());
-                    subMap.put(samplingPosition.name(), t);
-                }
-                trajectories.put(position.name(), subMap);
-            }
-        }
-        catch (IOException e) {
-            RobotLog.e(e.toString());
-            requestOpModeStop();
-        }
-    }
-
+    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        FtcDashboard dashboard = FtcDashboard.getInstance();
         RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
 
         RobotHardware rw = new RobotHardware(hardwareMap);
         FourWheelMecanumDrivetrain drivetrain = new FourWheelMecanumDrivetrain(rw);
-        SelectParameters.Parameters matchParameters = SelectParameters.matchParameters;
+        Parameters matchParameters = SelectParameters.getMatchParameters();
 
         ArmController armController = new ArmController(rw, telemetry, true);
-
-        /*VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-        parameters.vuforiaLicenseKey = "AcJSEaj/////AAABmZmYKDlSrk/tqCYXQbWF2zIZKePATp9JlOVeqyDFYAOLOJcwm5eO/EyXGAUCjoeJ2LwBWY5JdtBWhaRt3GVVLchqkKSMg8nrFAyAoQUAhLx1i+/9pcqq0Z7HMByQMzWK216ENi7sQ2GrKnETBbbt+82fyitozuTSFr1LAbIsbDd4IjsTmK7CRBhG0Ns9cOr7+prlgNiGHKYhvRwfvV8asHK76mCTPInkYhHMoC8bm+00Z3vzlFhNrDjOu4LpjVXH8KD2ksauFeM1lt3OOLqebuz4IbYkxTN33ZPU1pqJb9qYFaWIMO/7q6XTXMr9fO0Jm0zFt6N+yCe4lWq1UHrnG/MiK8CS30m/eLxItELpmHj7";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);*/
 
         SamplingPipeline pipeline = new SamplingPipeline();
         pipeline.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         pipeline.enable();
-
-        // ComplementaryVuforiaLocalizer localizer = new ComplementaryVuforiaLocalizer(vuforia, VuforiaLocalizer.CameraDirection.BACK, drive.getLocalizer());
 
         // TODO make localizer find initial position (instead of relying on hardcoded values)
         drive.getLocalizer().setPoseEstimate(matchParameters.startingPosition.startingPosition);
@@ -118,16 +85,15 @@ public class Autonomous extends LinearOpMode {
         }
         pipeline.disable();
         rw.pawServo.setPosition(LOCK_DISENGAGED);
-        SelectParameters.SamplingPosition position = pipeline.plurality;
+        Mineral position = pipeline.plurality;
         Thread.sleep(250);
-        // rw.resetEncoders();
 
         Trajectory trajectory;
         TrajectoryBuilderExtended builder;
         while (opModeIsActive()) {
 
             if (debug) {
-                matchParameters.mineralConfiguration = SelectParameters.SamplingPosition.values()[mineral];
+                matchParameters.mineralConfiguration = Mineral.values()[mineral];
             }
             else {
                 matchParameters.mineralConfiguration = position;
@@ -187,32 +153,14 @@ public class Autonomous extends LinearOpMode {
 
                     break;
                 case RED_FACING_CRATER:
-                    // SamplingArmAction armAction;
-                    // Thread armThread;
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            //builder = builder.splineTo(new Pose2d(new Vector2d(-17, -28), degToRad(-45))).splineTo(new Pose2d(new Vector2d(15, -61), degToRad(0))).turnTo(0);
-                            //builder = builder.lineTo(new Vector2d(49, -62.5)).turnTo(degToRad(-180)).lineTo(new Vector2d(-20, -62.5));
-
-                            //waitAndDisplayTrajectory(5, dashboard, builder);
-                            //armAction = new SamplingArmAction(1.5,5,rw);
-                            //armThread = new Thread(armAction);
-                            //armThread.start();
                             builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
                             break;
                         case CENTER:
-                            //builder = builder.splineTo(new Pose2d(new Vector2d(-32, -24), degToRad(-45))).turnTo(degToRad(-45)).lineTo(new Vector2d(-25, -37), new ConstantInterpolator(degToRad(-45)))
-                            //        .splineTo(new Pose2d(new Vector2d(10, -62.5), 0)).turnTo(0).lineTo(new Vector2d(48, -62.5), new ConstantInterpolator(0)).turnTo(degToRad(-180)).lineTo(new Vector2d(-20,-60), new ConstantInterpolator(degToRad(-180)));
-
                             builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
-
-                            // SamplingArmAction armActionMiddle = new SamplingArmAction(0,0,rw);
-                            // Thread armMiddle = new Thread(armActionMiddle);
-                            // armMiddle.start();
                             break;
                         case RIGHT:
-                            // builder = builder.splineTo(new Pose2d(new Vector2d(-39, -14), degToRad(-45))).splineTo(new Pose2d(new Vector2d(26, -60), 0)).lineTo(new Vector2d(48, -62.5), new ConstantInterpolator(0));
-                            // builder = builder.lineTo(new Vector2d(-20, -62.5), new ConstantInterpolator(0));
                             builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
                             break;
                     }
@@ -244,28 +192,12 @@ public class Autonomous extends LinearOpMode {
                 case BLUE_FACING_CRATER:
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            //builder = builder.splineTo(new Pose2d(new Vector2d(-17, -28), degToRad(-45))).splineTo(new Pose2d(new Vector2d(15, -61), degToRad(0))).turnTo(0);
-                            //builder = builder.lineTo(new Vector2d(49, -62.5)).turnTo(degToRad(-180)).lineTo(new Vector2d(-20, -62.5));
-
-                            //waitAndDisplayTrajectory(5, dashboard, builder);
-                            //armAction = new SamplingArmAction(1.5,5,rw);
-                            //armThread = new Thread(armAction);
-                            //armThread.start();
                             builder = builder.turnTo(degToRad(90)).lineTo(new Vector2d(22, 44), new ConstantInterpolator(degToRad(90))).turnTo(degToRad(45));
                             break;
                         case CENTER:
-                            //builder = builder.splineTo(new Pose2d(new Vector2d(-32, -24), degToRad(-45))).turnTo(degToRad(-45)).lineTo(new Vector2d(-25, -37), new ConstantInterpolator(degToRad(-45)))
-                            //        .splineTo(new Pose2d(new Vector2d(10, -62.5), 0)).turnTo(0).lineTo(new Vector2d(48, -62.5), new ConstantInterpolator(0)).turnTo(degToRad(-180)).lineTo(new Vector2d(-20,-60), new ConstantInterpolator(degToRad(-180)));
-
                             builder = builder.turnTo(degToRad(45)).lineTo(new Vector2d(33.5, 33.5), new ConstantInterpolator(degToRad(45)));
-
-                            // SamplingArmAction armActionMiddle = new SamplingArmAction(0,0,rw);
-                            // Thread armMiddle = new Thread(armActionMiddle);
-                            // armMiddle.start();
                             break;
                         case RIGHT:
-                            // builder = builder.splineTo(new Pose2d(new Vector2d(-39, -14), degToRad(-45))).splineTo(new Pose2d(new Vector2d(26, -60), 0)).lineTo(new Vector2d(48, -62.5), new ConstantInterpolator(0));
-                            // builder = builder.lineTo(new Vector2d(-20, -62.5), new ConstantInterpolator(0));
                             builder = builder.turnTo(0).lineTo(new Vector2d(44, 22), new ConstantInterpolator(degToRad(0))).turnTo(degToRad(45));
                             break;
                     }
@@ -281,78 +213,7 @@ public class Autonomous extends LinearOpMode {
             while (opModeIsActive()) {
                 armController.updateArmAuto();
             }
-            /*switch (matchParameters.mineralConfiguration) {
-                case LEFT:
-                    builder = builder.movePolarRelative(32, -45);
-                    break;
-                case CENTER:
-                    builder = builder.strafeRight(17.5);
-                    builder = builder.forward(4);
-                    break;
-                case RIGHT:
-                    builder = builder.movePolarRelative(32, -135);
-                    break;
-            }
-            trajectory = builder.build();
 
-            drive.followTrajectory(trajectory);
-            rw.samplingServo.setPosition(SAMPLING_SERVO_UP);
-
-            waitForTrajectoryFinish(drive);
-
-            rw.samplingServo.setPosition(SAMPLING_SERVO_DOWN);
-
-            builder = freshTrajectoryBuilder(drive);
-            switch (matchParameters.mineralConfiguration) {
-                case LEFT:
-                    builder = builder.back(5);
-                    break;
-                case CENTER:
-                    builder = builder.back(7);
-                    break;
-                case RIGHT:
-                    builder = builder.forward(5);
-                    break;
-            }
-            trajectory = builder.build();
-
-            drive.followTrajectory(trajectory);
-
-            waitForTrajectoryFinish(drive);
-
-            rw.samplingServo.setPosition(SAMPLING_SERVO_UP);
-
-
-            builder = freshTrajectoryBuilder(drive);
-
-            switch (matchParameters.startingPosition) {
-                case RED_FACING_DEPOT:
-                    builder = builder.reverse().lineTo(new Vector2d(0, -60)).reverse().turnTo(0).forward(30);
-                    trajectory = builder.build();
-
-                    break;
-                case RED_FACING_CRATER:
-                    builder.lineTo(new Vector2d(0, 60), new ConstantInterpolator(3/4 * Math.PI));
-                    builder.splineTo(new Pose2d(new Vector2d(60, 48), 1/2 * Math.PI));
-                    break;
-                case BLUE_FACING_DEPOT:
-                    builder.lineTo(new Vector2d(0, -60), new ConstantInterpolator(7/4 * Math.PI));
-                    builder.splineTo(new Pose2d(new Vector2d(-60, -48), 3/2 * Math.PI));
-                    break;
-                case BLUE_FACING_CRATER:
-                    builder.lineTo(new Vector2d(0, -60), new ConstantInterpolator(5/4 * Math.PI));
-                    builder.splineTo(new Pose2d(new Vector2d(-60, -48), 3/2 * Math.PI));
-                    break;
-            }
-
-            trajectory = builder.build();
-            drive.followTrajectory(trajectory);
-            waitForTrajectoryFinish(drive);
-
-            trajectory = freshTrajectoryBuilder(drive).back(50).build();
-            drive.followTrajectory(trajectory);
-            waitForTrajectoryFinish(drive);
-            */
         }
     }
 
@@ -411,5 +272,62 @@ public class Autonomous extends LinearOpMode {
         }
     }
 
+    public void tfodDetect() {
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                if (updatedRecognitions.size() == 3) {
+                    int goldMineralX = -1;
+                    int silverMineral1X = -1;
+                    int silverMineral2X = -1;
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                            goldMineralX = (int) recognition.getLeft();
+                        } else if (silverMineral1X == -1) {
+                            silverMineral1X = (int) recognition.getLeft();
+                        } else {
+                            silverMineral2X = (int) recognition.getLeft();
+                        }
+                    }
+                    if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+                        if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                            telemetry.addData("Gold Mineral Position", "Left");
+                        } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                            telemetry.addData("Gold Mineral Position", "Right");
+                        } else {
+                            telemetry.addData("Gold Mineral Position", "Center");
+                        }
+                    }
+                }
+                telemetry.update();
+            }
+        }
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+    }
+
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
 
 }

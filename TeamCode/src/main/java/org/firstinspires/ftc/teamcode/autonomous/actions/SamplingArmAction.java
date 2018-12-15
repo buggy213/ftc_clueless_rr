@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.autonomous.actions;
 
-import org.firstinspires.ftc.teamcode.drivetrain_test.RobotHardware;
+import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.SAMPLING_SERVO_DOWN;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.SAMPLING_SERVO_UP;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SAMPLING_SERVO_DOWN;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SAMPLING_SERVO_UP;
 
 public class SamplingArmAction extends TimeBasedAction {
 
