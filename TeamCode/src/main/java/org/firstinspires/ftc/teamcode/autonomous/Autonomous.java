@@ -6,43 +6,28 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.drive.Localizer;
 import com.acmerobotics.roadrunner.path.heading.ConstantInterpolator;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.corningrobotics.enderbots.endercv.CameraViewDisplay;
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.Coordinate_Tetst;
 import org.firstinspires.ftc.teamcode.armkinematics.ArmController;
 import org.firstinspires.ftc.teamcode.autonomous.actions.IntakeAction;
-import org.firstinspires.ftc.teamcode.autonomous.actions.SamplingArmAction;
 import org.firstinspires.ftc.teamcode.drivetrain_test.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.drivetrain_test.RobotHardware;
-import org.firstinspires.ftc.teamcode.motionplanningtest.drive.ComplementaryVuforiaLocalizer;
 import org.firstinspires.ftc.teamcode.motionplanningtest.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanningtest.util.AssetsTrajectoryLoader;
 import org.firstinspires.ftc.teamcode.motionplanningtest.util.DashboardUtil;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.firstinspires.ftc.teamcode.autonomous.SelectParameters.matchParameters;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_DOWN;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_MARKER;
 import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_UP;
 import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.LOCK_DISENGAGED;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.LOCK_ENGAGED;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Main Autonomous")
 @Config

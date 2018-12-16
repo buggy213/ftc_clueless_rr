@@ -45,7 +45,7 @@ public class SamplingPipeline extends OpenCVPipeline {
 
         matOfPoints = new ArrayList<>();
         Imgproc.cvtColor(rgba, hsv, Imgproc.COLOR_RGB2HSV);
-        Core.inRange(hsv, new Scalar(18, 128, 128), new Scalar(54, 255, 255), gold);
+        Core.inRange(hsv, new Scalar(18, 150, 150), new Scalar(54, 255, 255), gold);
         Imgproc.findContours(gold, matOfPoints, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         double maxScore = -100;
         bestContour = null;
@@ -82,7 +82,7 @@ public class SamplingPipeline extends OpenCVPipeline {
     }
 
     public SelectParameters.SamplingPosition determinePosition(MatOfPoint contour, double imageX, Mat rgba) {
-        if (Imgproc.contourArea(contour) < 5000) {
+        if (Imgproc.contourArea(contour) < 4000) {
             return SelectParameters.SamplingPosition.RIGHT;
         }
 
