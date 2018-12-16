@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.autonomous.actions;
 
-import org.firstinspires.ftc.teamcode.drivetrain_test.RobotHardware;
+import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_DOWN;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_JOINT_UP;
-import static org.firstinspires.ftc.teamcode.drivetrain_test.RobotConstants.INTAKE_SPEED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_DOWN;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
 
 public class IntakeAction extends TimeBasedAction {
     RobotHardware rw;
