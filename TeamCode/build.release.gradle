@@ -5,10 +5,5 @@ dependencies {
     implementation (name: 'FtcCommon-release', ext: 'aar')
     implementation (name: 'WirelessP2p-release', ext:'aar')
     implementation (name: 'tfod-release', ext:'aar')
-
-    implementation 'com.acmerobotics.roadrunner:core:0.2.3'
-    implementation 'com.acmerobotics.dashboard:dashboard:0.2.1'
-    implementation 'org.openftc:rev-extensions-2:1.1'
-    implementation project(path: ':openCVLibrary3')
-    implementation project(path: ':endercv')
+    implementation (name: 'tensorflow-lite-0.0.0-nightly', ext:'aar')
 }
