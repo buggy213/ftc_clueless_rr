@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.arm.armkinematics;
+package org.firstinspires.ftc.teamcode.arm;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.exception.RobotCoreException;
@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.arm.armkinematics.PIDController;
+import org.firstinspires.ftc.teamcode.arm.armkinematics.TwoJointedArmKinematics;
 import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 

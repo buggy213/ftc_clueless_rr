@@ -11,6 +11,7 @@ public class RobotHardware {
         public Servo samplingServo, intakeJoint, pawServo, sorterPivot, door;
         public MotorServo firstJointVirtualServo, secondJointVirtualServo;
 
+        public HardwareMap hardwareMap;
 
     public RobotHardware(HardwareMap hwMap) {
             backLeft = (DcMotorEx)hwMap.get(DcMotor.class, "backLeft");
@@ -30,6 +31,8 @@ public class RobotHardware {
 
             firstJointVirtualServo = new MotorServo(firstJoint, MotorServo.MotorConfiguration.firstJoint);
             secondJointVirtualServo = new MotorServo(secondJoint, MotorServo.MotorConfiguration.secondJoint);
+
+            this.hardwareMap = hwMap;
         }
 
         public void resetEncoders() throws InterruptedException{
