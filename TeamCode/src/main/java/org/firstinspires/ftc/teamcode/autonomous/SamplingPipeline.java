@@ -82,7 +82,7 @@ public class SamplingPipeline extends OpenCVPipeline {
     }
 
     public SelectParameters.SamplingPosition determinePosition(MatOfPoint contour, double imageX, Mat rgba) {
-        if (Imgproc.contourArea(contour) < 4000) {
+        if (Imgproc.contourArea(contour) < 500) {
             return SelectParameters.SamplingPosition.RIGHT;
         }
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Distance_Sensor;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,7 +15,7 @@ import java.util.Queue;
  * Created by DrZ on 11/23/18.
  */
 
-@TeleOp(name="Distance Test")
+@TeleOp(name="Distance Test?")
 public class DistanceSensor_Test extends LinearOpMode {
     private DistanceSensor sensorRange1;
     private DistanceSensor sensorRange2;
