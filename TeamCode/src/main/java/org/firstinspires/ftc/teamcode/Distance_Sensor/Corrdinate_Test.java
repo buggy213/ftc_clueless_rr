@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.Distance_Sensor;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.autonomous.RoverRuckusMecanumDriveREVOptimized;
@@ -25,12 +23,13 @@ public class Corrdinate_Test extends  LinearOpMode {
     private DistanceSensor sensorrange1;
     private DistanceSensor sensorrange2;
     private DistanceSensor sensorrange3;
-    double a;
-    double b;
-    double c;
-    double d;
+    double front;
+    double right;
+    double left;
+    double back;
     double x = 0;
     double y = 0;
+    double fieldsize = 182.88;
     boolean turningTowards = false;
     final double turnSpeed = 0.6;
     final double slowSpeed = 0.4; // 0.8
@@ -64,13 +63,15 @@ public class Corrdinate_Test extends  LinearOpMode {
         telemetry.addData("Heading", radToDeg(drive.getExternalHeading()));
         telemetry.update();
 
-        a = sensorrange1.getDistance(DistanceUnit.CM);
-        d = sensorrange2.getDistance(DistanceUnit.CM);
-        b = sensorrange3.getDistance((DistanceUnit.CM));
-        c = sensorrange0.getDistance(DistanceUnit.CM);
+        front = sensorrange1.getDistance(DistanceUnit.CM);
+        back = sensorrange2.getDistance(DistanceUnit.CM);
+        right = sensorrange3.getDistance((DistanceUnit.CM));
+        left = sensorrange0.getDistance(DistanceUnit.CM);
         waitForStart();
 
         while (opModeIsActive()) {
+            double Vertical = Math.min(front, back);
+            double Horizontal = Math.min(left,right);
             double Heading = radToDeg(drive.getExternalHeading());
             // Driving Gamepads logic
             // region driving
@@ -99,44 +100,44 @@ public class Corrdinate_Test extends  LinearOpMode {
                 drivetrain.stop();
             }
                 if (Heading > 0 && Heading < 45) {
-                    x = 160.02 - Math.cos(Math.toRadians(45 - Heading)) * Math.min(a,d);
-                    y = 160.02 - Math.cos(Math.toRadians(45 - Heading)) * Math.min(b,c);
+                    x = fieldsize  - Math.cos(Math.toRadians(Heading)) * Vertical;
+                    y = fieldsize  - Math.cos(Math.toRadians(Heading)) * Horizontal;
                 } else if (Heading > 45 && Heading < 90) {
-                    x = 160.02 - Math.cos(Math.toRadians(Heading - 45)) * Math.min(b, c);
-                    y = 160.02 - Math.cos(Math.toRadians(Heading - 45)) * Math.min(a, d);
+                    x = fieldsize  - Math.cos(Math.toRadians(90 - Heading)) * Horizontal;
+                    y = fieldsize  - Math.cos(Math.toRadians(90 - Heading)) * Vertical; 
                 } else if (Heading > 90 && Heading < 135) {
-                    x = 160.02 - Math.cos(Math.toRadians(135 - Heading)) * Math.min(b, c);
-                    y = 160.02 - Math.cos(Math.toRadians(135 - Heading)) * Math.min(a, d);
+                    x = fieldsize  - Math.cos(Math.toRadians(Heading - 90)) * Horizontal;
+                    y = fieldsize  - Math.cos(Math.toRadians(Heading - 90)) * Vertical; 
                 } else if (Heading > 135 && Heading < 180) {
-                    x = 160.02 - Math.cos(Math.toRadians(Heading - 135)) * Math.min(a, d);
-                    y = 160.02 - Math.cos(Math.toRadians(Heading - 135)) * Math.min(b, c);
+                    x = fieldsize  - Math.cos(Math.toRadians(180 -Heading)) * Vertical; 
+                    y = fieldsize  - Math.cos(Math.toRadians(180 -Heading)) * Horizontal;
                 } else if (Heading < 225 && Heading > 180) {
-                    x = 160.02 - Math.cos(Math.toRadians(225 - Heading)) * Math.min(a, d);
-                    y = 160.02 - Math.cos(Math.toRadians(225 - Heading)) * Math.min(b, c);
+                    x = fieldsize  - Math.cos(Math.toRadians(Heading - 180)) * Vertical; 
+                    y = fieldsize  - Math.cos(Math.toRadians(Heading - 180)) * Horizontal;
                 } else if (Heading < 270 && Heading > 225) {
-                    x = 160.02 - Math.cos(Math.toRadians(Heading - 225)) * Math.min(b, c);
-                    y = 160.02 - Math.cos(Math.toRadians(Heading - 225)) * Math.min(a, d);
+                    x = fieldsize  - Math.cos(Math.toRadians(270 - Heading)) * Horizontal;
+                    y = fieldsize  - Math.cos(Math.toRadians(270 - Heading)) * Vertical; 
                 } else if (Heading < 315 && Heading > 270) {
-                    x = 160.02 - Math.cos(Math.toRadians(315 - Heading)) * Math.min(b,c);
-                    y = 160.02 - Math.cos(Math.toRadians(315 - Heading)) * Math.min(a,d);
+                    x = fieldsize  - Math.cos(Math.toRadians(Heading - 270)) * Horizontal;
+                    y = fieldsize  - Math.cos(Math.toRadians(Heading - 270)) * Vertical;
                 } else if (Heading < 360 && Heading > 315) {
-                    x = 160.02 - Math.cos(Math.toRadians(Heading - 315)) * Math.min(a, d);
-                    y = 160.02 - Math.cos(Math.toRadians(Heading - 315)) * Math.min(b, c);
+                    x = fieldsize  - Math.cos(Math.toRadians(360 - Heading)) * Vertical;
+                    y = fieldsize  - Math.cos(Math.toRadians(360 - Heading)) * Horizontal;
                 }else if(Heading == 0 || Heading == 180 || Heading == 360){
-                    x = 160.02 - Math.min(a,d);
-                    y = 160.02 - Math.min(b,c);
+                    x = fieldsize  - Vertical; 
+                    y = fieldsize  - Horizontal;
                 }else if(Heading == 90 || Heading == 270){
-                    x = 160.02 - Math.min(b,c);
-                    y = 160.02 - Math.min(a,d);
+                    x = fieldsize  - Horizontal;
+                    y = fieldsize  - Vertical; 
                 }
-                if(Math.min(a,d)==a&&Math.min(b,c)==b){
+                if(Math.min(front, back)==front&&Math.min(right, left)==right){
                     x = 0-x;
                 }
-                if(Math.min(a,d)==a&&Math.min(b,c)==c){
+                if(Math.min(front, back)==front&&Math.min(right, left)== left){
                     x = 0-x;
                     y = 0-y;
                 }
-                if(Math.min(a,d)==d&&Math.min(b,c)==c){
+                if(Math.min(front, back)== back &&Math.min(right, left)== left){
                     y = 0-y;
                 }
                 telemetry.addData("X:", x);
