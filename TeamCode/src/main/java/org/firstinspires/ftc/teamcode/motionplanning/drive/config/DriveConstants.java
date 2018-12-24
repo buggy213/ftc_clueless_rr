@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.motionplanningtest.drive;
+package org.firstinspires.ftc.teamcode.motionplanning.drive.config;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.qualcomm.hardware.motors.NeveRest20Gearmotor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.motionplanningtest.drive.opmode.GearmotorConfig;
-import org.firstinspires.ftc.teamcode.motionplanningtest.drive.opmode.Neverest20GearmotorConfig;
-import org.firstinspires.ftc.teamcode.motionplanningtest.drive.opmode.Neverest40GearmotorConfig;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.config.GearmotorConfig;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.config.Neverest20GearmotorConfig;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.config.Neverest40GearmotorConfig;
 
 /*
  * Constants shared between multiple drive types.
