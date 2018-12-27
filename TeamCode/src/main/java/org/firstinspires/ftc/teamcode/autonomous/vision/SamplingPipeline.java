@@ -4,8 +4,6 @@ import com.acmerobotics.dashboard.config.Config;
 
 import org.corningrobotics.enderbots.endercv.OpenCVPipeline;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
-import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -44,8 +42,14 @@ public class SamplingPipeline extends OpenCVPipeline {
 
         matOfPoints = new ArrayList<>();
         Imgproc.cvtColor(rgba, hsv, Imgproc.COLOR_RGB2HSV);
-        GoldThreshold goldThreshold = new GoldThreshold();
-        goldThreshold.threshold(hsv, gold);
+        Threshold goldThreshold;
+        if (AutoCalibrateOpMode.threshold == null) {
+            goldThreshold = new Threshold();
+            goldThreshold.threshold(hsv, gold);
+        }
+        else {
+            goldThreshold = AutoCalibrateOpMode.threshold;
+        }
         Imgproc.findContours(gold, matOfPoints, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         double maxScore = -100;
         bestContour = null;

@@ -7,11 +7,20 @@ import org.opencv.core.Scalar;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GoldThreshold {
-    public Scalar[] lowerBounds;
-    public Scalar[] upperBounds;
-    Mat temp = new Mat();
-    public GoldThreshold() {
+public class Threshold {
+    private Scalar[] lowerBounds;
+    private Scalar[] upperBounds;
+    private Mat temp = new Mat();
+
+    public Scalar[] getLowerBounds() {
+        return lowerBounds;
+    }
+
+    public Scalar[] getUpperBounds() {
+        return upperBounds;
+    }
+
+    public Threshold() {
         // Change these values here based on lighting of venue
         lowerBounds = new Scalar[] {
                 new Scalar(18, 128, 128)
@@ -19,6 +28,15 @@ public class GoldThreshold {
         upperBounds = new Scalar[] {
                 new Scalar(54, 255, 255)
         };
+    }
+
+    public Threshold(Scalar lower, Scalar upper) {
+        this(new Scalar[] {lower}, new Scalar[] {upper});
+    }
+
+    public Threshold(Scalar[] lowerBounds, Scalar[] upperBounds) {
+        this.lowerBounds = lowerBounds;
+        this.upperBounds = upperBounds;
     }
 
     public Mat threshold(Mat input, Mat mask) {
