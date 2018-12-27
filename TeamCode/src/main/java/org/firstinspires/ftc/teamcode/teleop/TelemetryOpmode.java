@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.arm.ArmController;
+import org.firstinspires.ftc.teamcode.arm.ArmSetpoints;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 
@@ -81,13 +82,16 @@ public class TelemetryOpmode extends LinearOpMode {
     boolean door, intake;
     boolean doorToggle, intakeToggle;
 
-    int armControlMode = 0;
     int intakeMode = 1;
 
     double previousTimeStamp = 0;
 
     FourWheelMecanumDrivetrain drivetrain;
     ArmController armController;
+
+
+
+    private boolean movingToSetpoint;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -220,7 +224,25 @@ public class TelemetryOpmode extends LinearOpMode {
             back = gamepad2.back;
 
             rw.linearSlider.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
-            if (manualArmControl) {
+
+
+            if (gamepad2.dpad_left) {
+                movingToSetpoint = true;
+                armController.setPositions(ArmSetpoints.SCORE);
+            }
+
+            if (gamepad2.dpad_right) {
+                movingToSetpoint = true;
+                armController.setPositions(ArmSetpoints.COLLECT);
+            }
+
+            if (movingToSetpoint) {
+                armController.updateArmAuto();
+                if (gamepad2.left_stick_y != 0 || gamepad2.right_stick_y != 0) {
+                    movingToSetpoint = false;
+                }
+            }
+            else if (manualArmControl) {
                 armController.manualArmControl(gamepad2);
             }
             else {

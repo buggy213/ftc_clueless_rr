@@ -63,8 +63,6 @@ public class JointController {
 
     }
 
-
-
     private void initializeIMU(HardwareMap hardwareMap) {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;

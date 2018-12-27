@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.arm.armkinematics.PIDController;
 import org.firstinspires.ftc.teamcode.arm.armkinematics.TwoJointedArmKinematics;
 import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
+import org.firstinspires.ftc.teamcode.teleop.TelemetryOpmode;
 
 @Config
 public class ArmController {
@@ -33,6 +34,8 @@ public class ArmController {
     static final double horizontalFactor = 0.0025;
 
     static final double MAX_SPEED = 1;
+
+    static final int TARGET_TOLERANCE = 50;
     // endregion
 
     TwoJointedArmKinematics kinematics;
@@ -250,6 +253,16 @@ public class ArmController {
     public void setPositions(int firstJointTarget, int secondJointTarget) {
         this.firstJointTarget = firstJointTarget;
         this.secondJointTarget = secondJointTarget;
+    }
+
+    public void setPositions(ArmSetpoints setpoint) {
+        setPositions(setpoint.firstJoint, setpoint.secondJoint);
+    }
+
+    public boolean reachedTarget() {
+        boolean firstJoint = Math.abs(firstJointTarget - robotHardware.firstJoint.getCurrentPosition()) < TARGET_TOLERANCE;
+        boolean secondJoint = Math.abs(secondJointTarget - robotHardware.firstJoint.getCurrentPosition()) < TARGET_TOLERANCE;
+        return firstJoint && secondJoint;
     }
 
     public void updateArmAuto() {
