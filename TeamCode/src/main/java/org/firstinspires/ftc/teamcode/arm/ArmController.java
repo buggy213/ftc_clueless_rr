@@ -32,8 +32,6 @@ public class ArmController {
     static final double rotationFactor = 0.0005;
     static final double horizontalFactor = 0.0025;
 
-
-
     static final double MAX_SPEED = 1;
     // endregion
 
