@@ -11,4 +11,7 @@ dependencies {
     implementation 'org.openftc:rev-extensions-2:1.1'
     implementation project(path: ':openCVLibrary3')
     implementation project(path: ':endercv')
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+
 }

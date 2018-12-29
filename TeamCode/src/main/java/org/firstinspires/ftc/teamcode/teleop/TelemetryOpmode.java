@@ -29,6 +29,11 @@
 
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -40,6 +45,8 @@ import org.firstinspires.ftc.teamcode.arm.ArmController;
 import org.firstinspires.ftc.teamcode.arm.ArmSetpoints;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
+import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
+import org.firstinspires.ftc.teamcode.shared.Vuforia;
 
 import java.util.List;
 
@@ -65,7 +72,7 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SORTER_TUCKED
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-
+@Config
 @TeleOp(name="TeleOp", group="Linear Opmode")
 public class TelemetryOpmode extends LinearOpMode {
 
@@ -79,23 +86,31 @@ public class TelemetryOpmode extends LinearOpMode {
     boolean turningTowards = false;
     boolean manualArmControl = true;
 
-    boolean door, intake;
-    boolean doorToggle, intakeToggle;
+    boolean door;
+    boolean doorToggle;
 
     int intakeMode = 1;
 
     double previousTimeStamp = 0;
 
-    FourWheelMecanumDrivetrain drivetrain;
-    ArmController armController;
+    private FourWheelMecanumDrivetrain drivetrain;
+    private ArmController armController;
+    private Vuforia vuforia;
+    private RoverRuckusMecanumDriveREVOptimized drive;
 
-
+    public static boolean debugPosition;
 
     private boolean movingToSetpoint;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         RobotHardware rw = new RobotHardware(hardwareMap);
+
+        if (debugPosition) {
+            drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
+            vuforia = new Vuforia();
+            vuforia.init(hardwareMap);
+        }
 
         boolean back = false;
 
@@ -117,9 +132,27 @@ public class TelemetryOpmode extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        if (debugPosition) {
+            vuforia.activateTargets();
+        }
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double deltaTime = runtime.milliseconds() - previousTimeStamp;
+
+            if (debugPosition) {
+                drive.updatePoseEstimate();
+                Pose2d odometryEstimate = drive.getPoseEstimate();
+                Pose2d vuforiaEstimate = vuforia.getPosition();
+                TelemetryPacket packet = new TelemetryPacket();
+                Canvas canvas = packet.fieldOverlay();
+                canvas.setFill("green");
+                canvas.fillCircle(odometryEstimate.getX(), odometryEstimate.getY(), 2.5);
+                canvas.setFill("blue");
+                canvas.fillCircle(vuforiaEstimate.getX(), vuforiaEstimate.getY(), 2.5);
+                FtcDashboard.getInstance().sendTelemetryPacket(packet);
+            }
+
             // Driving Gamepads logic
             // region driving
             double turn = (-1) * (gamepad1.left_trigger - gamepad1.right_trigger) * turnSpeed;
@@ -178,10 +211,6 @@ public class TelemetryOpmode extends LinearOpMode {
             }
             if (gamepad1.b && !door) {
                 doorToggle = !doorToggle;
-            }
-
-            if (gamepad1.a && !intake) {
-                intakeToggle = !intakeToggle;
             }
 
             if (gamepad2.x) {
