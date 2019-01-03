@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class RobotHardware {
         public DcMotorEx backLeft, backRight, frontLeft, frontRight, linearSlider, firstJoint, secondJoint, intake;
 
-        public Servo samplingServo, intakeJoint, pawServo, sorterPivot, door;
+        public Servo samplingServo, intakeJoint, pawServo, sorterPivot, leftClaw, rightClaw;
         public MotorServo firstJointVirtualServo, secondJointVirtualServo;
 
         public HardwareMap hardwareMap;
@@ -27,7 +27,8 @@ public class RobotHardware {
             intakeJoint = hwMap.get(Servo.class, "intakeJoint");
             pawServo = hwMap.get(Servo.class, "pawServo");
             sorterPivot = hwMap.get(Servo.class, "sorterPivot");
-            door = hwMap.get(Servo.class, "door");
+            leftClaw = hwMap.get(Servo.class, "left");
+            rightClaw = hwMap.get(Servo.class, "right");
 
             firstJointVirtualServo = new MotorServo(firstJoint, MotorServo.MotorConfiguration.firstJoint);
             secondJointVirtualServo = new MotorServo(secondJoint, MotorServo.MotorConfiguration.secondJoint);

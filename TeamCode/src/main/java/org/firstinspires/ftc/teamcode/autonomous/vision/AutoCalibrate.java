@@ -18,11 +18,16 @@ public class AutoCalibrate {
 
     private final int STEP_SIZE = 1;
     private final int TOLERANCE = 2;
-    private final double MAX_LOSS = 0.05;
+    private final double MAX_LOSS = 0.25;
 
     public Threshold calibrate(Mat input, Mat mask, int toHSV, int toGray) {
         Imgproc.cvtColor(input, input, toHSV);
-        Imgproc.cvtColor(mask, mask, toGray);
+        // Imgproc.cvtColor(mask, mask, toGray);
+
+        if (mask.size() != input.size()) {
+            // Mask is too big
+            Imgproc.resize(mask, mask, input.size());
+        }
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
@@ -36,6 +41,12 @@ public class AutoCalibrate {
         double[] hueBounds = optimizeChannel(0, contour, input, mask);
         double[] satBounds = optimizeChannel(1, contour, input, mask);
         double[] valBounds = optimizeChannel(2, contour, input, mask);
+
+        RobotLog.i("Thresholding complete");
+        RobotLog.i(Arrays.toString(hueBounds));
+        RobotLog.i(Arrays.toString(satBounds));
+        RobotLog.i(Arrays.toString(valBounds));
+
         hierarchy.release();
 
         Scalar lowerBound = new Scalar(hueBounds[0], satBounds[0], valBounds[0]);
@@ -82,6 +93,7 @@ public class AutoCalibrate {
         Mat testMask = new Mat();
 
         Core.inRange(image, lowerScalar, upperScalar, testMask);
+
         Core.bitwise_and(testMask, mask, testMask);
 
         int contoursSum = Core.countNonZero(testMask);

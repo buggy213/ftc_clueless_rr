@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.path.heading.ConstantInterpolator;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
 import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.TrajectoryBuilderExtended;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryManager;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
@@ -38,7 +40,8 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAG
 @Config
 public class Autonomous extends LinearOpMode {
 
-    public static boolean debug = false;
+    public static boolean debug = true;
+    public static boolean landed = true;
     public static int mineral = 0;
 
     public static int TIME_GOING_DOWN = 2800;
@@ -70,9 +73,7 @@ public class Autonomous extends LinearOpMode {
         // TODO make localizer find initial position (instead of relying on hardcoded values)
         drive.getLocalizer().setPoseEstimate(matchParameters.startingPosition.startingPosition);
 
-
-
-
+        TrajectoryManager.update();
 
         while (!isStarted()) {
             drive.updatePoseEstimate();
@@ -84,12 +85,14 @@ public class Autonomous extends LinearOpMode {
             telemetry.update();
         }
         pipeline.disable();
-        rw.pawServo.setPosition(LOCK_DISENGAGED);
         Mineral position = pipeline.plurality;
-        Thread.sleep(250);
+
+        if (!landed) {
+            land(rw, drivetrain);
+        }
 
         Trajectory trajectory;
-        TrajectoryBuilderExtended builder;
+        TrajectoryBuilder builder;
         while (opModeIsActive()) {
 
             if (debug) {
@@ -99,30 +102,14 @@ public class Autonomous extends LinearOpMode {
                 matchParameters.mineralConfiguration = position;
             }
 
-            rw.linearSlider.setPower(-1);
-            Thread.sleep(800);
-            rw.linearSlider.setPower(0.45);
-            Thread.sleep(TIME_GOING_DOWN);
-            rw.linearSlider.setPower(0);
-            Thread.sleep(250);
-            rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2400);
-            rw.linearSlider.setPower(1);
-            Thread.sleep(800);
-            AutoMove(-0.25, 0, 250, drivetrain, rw);
-            rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rw.linearSlider.setPower(-1);
-            Thread.sleep(1500);
-            rw.linearSlider.setPower(0);
-            AutoMove(0.25, 0, 250, drivetrain, rw);
 
-            builder = freshTrajectoryBuilder(drive);
+
+            /*builder = freshTrajectoryBuilder(drive);
             builder = builder.strafeRight(Math.sqrt(200));
             trajectory = builder.build();
             drive.followTrajectory(trajectory);
             waitForTrajectoryFinish(drive, trajectory);
-
-
+            */
             builder = freshTrajectoryBuilder(drive);
 
             rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
@@ -132,8 +119,8 @@ public class Autonomous extends LinearOpMode {
 
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
-                            builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-20, -63), new ConstantInterpolator(degToRad(-180)));
+                            builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
+                            waitAndDisplayTrajectory(15, FtcDashboard.getInstance(), builder);
                             markerAction = new IntakeAction(4.3, 5.5, rw);
                             break;
                         case CENTER:
@@ -218,8 +205,8 @@ public class Autonomous extends LinearOpMode {
         }
     }
 
-    TrajectoryBuilderExtended freshTrajectoryBuilder(RoverRuckusMecanumDriveREVOptimized drive) {
-        return new TrajectoryBuilderExtended(drive.getPoseEstimate(), DriveConstants.BASE_CONSTRAINTS);
+    private TrajectoryBuilder freshTrajectoryBuilder(RoverRuckusMecanumDriveREVOptimized drive) {
+        return new TrajectoryBuilder(drive.getPoseEstimate(), DriveConstants.BASE_CONSTRAINTS);
     }
 
     void waitForTrajectoryFinish(RoverRuckusMecanumDriveREVOptimized drive, Trajectory trajectory) {
@@ -258,7 +245,7 @@ public class Autonomous extends LinearOpMode {
         return rad * 180 / Math.PI;
     }
 
-    void waitAndDisplayTrajectory(double time, FtcDashboard dashboard, TrajectoryBuilderExtended trajectoryBuilder){
+    void waitAndDisplayTrajectory(double time, FtcDashboard dashboard, TrajectoryBuilder trajectoryBuilder){
         Trajectory trajectory = trajectoryBuilder.build();
         resetStartTime();
         while(getRuntime() < time) {
@@ -329,6 +316,28 @@ public class Autonomous extends LinearOpMode {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
+
+    public void land(RobotHardware rw, FourWheelMecanumDrivetrain drivetrain)  throws InterruptedException{
+
+        rw.pawServo.setPosition(LOCK_DISENGAGED);
+        Thread.sleep(250);
+        rw.linearSlider.setPower(-1);
+        Thread.sleep(800);
+        rw.linearSlider.setPower(0.45);
+        Thread.sleep(TIME_GOING_DOWN);
+        rw.linearSlider.setPower(0);
+        Thread.sleep(250);
+        rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2400);
+        rw.linearSlider.setPower(1);
+        Thread.sleep(800);
+        AutoMove(-0.25, 0, 250, drivetrain, rw);
+        rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rw.linearSlider.setPower(-1);
+        Thread.sleep(1500);
+        rw.linearSlider.setPower(0);
+        AutoMove(0.25, 0, 250, drivetrain, rw);
     }
 
 }

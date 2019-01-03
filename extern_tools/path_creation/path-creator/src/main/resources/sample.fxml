@@ -35,7 +35,7 @@
          <children>
             <Button fx:id="button" mnemonicParsing="false" prefHeight="31.0" prefWidth="315.0" text="Export" GridPane.rowIndex="2" />
             <ChoiceBox fx:id="choice" prefHeight="31.0" prefWidth="319.0" />
-            <TextField fx:id="pathName" text="name" GridPane.rowIndex="1" />
+            <TextField fx:id="pathName" promptText="name" GridPane.rowIndex="1" />
             <TextField fx:id="base64" GridPane.rowIndex="3" />
          </children>
       </GridPane>

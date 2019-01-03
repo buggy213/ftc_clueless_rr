@@ -27,6 +27,7 @@ public class TrajectoryBuilderWrapper {
         }
 
         this.options = options;
+        this.name = name;
         poses = pose2dList;
         this.constraints = constraints;
     }

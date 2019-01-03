@@ -35,7 +35,17 @@ public class TrajectoryBuilderWrapper {
     }
 
     public TrajectoryBuilder toTrajectoryBuilder() {
-        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(poses.get(0), constraints, 2500);
+        return toTrajectoryBuilder(new Pose2d(0,0,0));
+    }
+
+    public TrajectoryBuilder toTrajectoryBuilder(Pose2d poseEstimate) {
+        poses = new ArrayList<>();
+        for (Pose2dWrapper pose : pose2dWrapper) {
+            poses.add(new Pose2d(pose.x, pose.y, pose.heading));
+        }
+        constraints = new DriveConstraints(driveConstraintsWrapper.maxVel, driveConstraintsWrapper.maxAcc, driveConstraintsWrapper.maxAngleVel, driveConstraintsWrapper.maxAngleAcc);
+
+        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(poseEstimate, constraints, 2500);
         int i = 0;
         for (Options o : options) {
             switch(o) {

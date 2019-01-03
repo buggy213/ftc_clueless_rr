@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.firstinspires.ftc.teamcode.autonomous.Autonomous.debug;
+
 /*
  * Optimized mecanum drive implementation for REV ExHs. The time savings here are enough to cut loop
  * iteration times in half which may significantly improve trajectory following performance.
@@ -30,8 +32,10 @@ import java.util.List;
 public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase {
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
-    private BNO055IMU imu;
+    private static BNO055IMU imu;
 
+
+    private final boolean reset = false;
     private double offset;
 
     PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0, 50);
@@ -46,10 +50,12 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
         this.offset = offset;
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        if (imu == null || reset) {
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            imu.initialize(parameters);
+        }
 
         setLocalizer(new MecanumLocalizer(this, true));
 
@@ -149,7 +155,6 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
             fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);
 
             dashboard.sendTelemetryPacket(packet);
-
     }
 
     public boolean verifyTrajectoryConfig(TrajectoryConfig config) {

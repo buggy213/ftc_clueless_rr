@@ -50,7 +50,7 @@ public class ArmController {
     double length = 35.4;
     double angle = 0;
 
-    static final double MANUAL_SPEED = 0.25;
+    static final double MANUAL_SPEED = 1;
 
     double firstJointTarget = 0;
     double secondJointTarget = 0;

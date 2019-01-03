@@ -44,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.arm.ArmController;
 import org.firstinspires.ftc.teamcode.arm.ArmSetpoints;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 import org.firstinspires.ftc.teamcode.shared.Vuforia;
@@ -123,7 +124,7 @@ public class TelemetryOpmode extends LinearOpMode {
         drivetrain.setSpeedMultiplier(slowSpeed);
         drivetrain.resetEncoders();
 
-        drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rw.frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rw.backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -209,9 +210,6 @@ public class TelemetryOpmode extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 rw.sorterPivot.setPosition(SORTER_OUT);
             }
-            if (gamepad1.b && !door) {
-                doorToggle = !doorToggle;
-            }
 
             if (gamepad2.x) {
                 rw.intakeJoint.setPosition(INTAKE_JOINT_COLLECT);
@@ -219,13 +217,6 @@ public class TelemetryOpmode extends LinearOpMode {
 
             if (gamepad2.y) {
                 rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
-            }
-
-            if (doorToggle) {
-                rw.door.setPosition(DOOR_BLOCK);
-            }
-            else {
-                rw.door.setPosition(DOOR_RELEASED);
             }
 
             if (gamepad1.y) {
@@ -255,14 +246,29 @@ public class TelemetryOpmode extends LinearOpMode {
             rw.linearSlider.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
 
 
-            if (gamepad2.dpad_left) {
+            if (gamepad2.left_bumper) {
                 movingToSetpoint = true;
                 armController.setPositions(ArmSetpoints.SCORE);
             }
 
-            if (gamepad2.dpad_right) {
+            if (gamepad2.right_bumper) {
                 movingToSetpoint = true;
                 armController.setPositions(ArmSetpoints.COLLECT);
+            }
+
+            if (gamepad2.dpad_left) {
+                rw.leftClaw.setPosition(RobotConstants.OPEN_CLAW_LEFT);
+                rw.rightClaw.setPosition(RobotConstants.OPEN_CLAW_RIGHT);
+            }
+
+            if (gamepad2.dpad_right) {
+                rw.leftClaw.setPosition(RobotConstants.WIDE_CLAW_LEFT);
+                rw.rightClaw.setPosition(RobotConstants.WIDE_CLAW_RIGHT);
+            }
+
+            if (gamepad2.dpad_up) {
+                rw.leftClaw.setPosition(RobotConstants.NARROW_CUBE_CLAW_LEFT);
+                rw.rightClaw.setPosition(RobotConstants.NARROW_CUBE_CLAW_RIGHT);
             }
 
             if (movingToSetpoint) {

@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 import org.corningrobotics.enderbots.endercv.OpenCVPipeline;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
+import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -34,6 +35,19 @@ public class SamplingPipeline extends OpenCVPipeline {
     public static double idealSolidity = 0.8;
     double maxSolidityDeviation = 0.3;
     double solidityWeight = 1;
+
+    Threshold goldThreshold;
+    @Override
+    public void enable() {
+        super.enable();
+        if (AutoCalibrateOpMode.load() == null) {
+            goldThreshold = new Threshold();
+        }
+        else {
+            goldThreshold = AutoCalibrateOpMode.load();
+        }
+    }
+
     @Override
     public Mat processFrame(Mat rgba, Mat gray) {
         if (rgba == null || rgba.size() == new Size(0,0))
@@ -42,14 +56,8 @@ public class SamplingPipeline extends OpenCVPipeline {
 
         matOfPoints = new ArrayList<>();
         Imgproc.cvtColor(rgba, hsv, Imgproc.COLOR_RGB2HSV);
-        Threshold goldThreshold;
-        if (AutoCalibrateOpMode.threshold == null) {
-            goldThreshold = new Threshold();
-            goldThreshold.threshold(hsv, gold);
-        }
-        else {
-            goldThreshold = AutoCalibrateOpMode.threshold;
-        }
+
+        goldThreshold.threshold(hsv, gold);
         Imgproc.findContours(gold, matOfPoints, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         double maxScore = -100;
         bestContour = null;
@@ -86,7 +94,7 @@ public class SamplingPipeline extends OpenCVPipeline {
     }
 
     public Mineral determinePosition(MatOfPoint contour, double imageX, Mat rgba) {
-        if (Imgproc.contourArea(contour) < 5000) {
+        if (Imgproc.contourArea(contour) < RobotConstants.CONTOUR_MIN_AREA) {
             return Mineral.RIGHT;
         }
 

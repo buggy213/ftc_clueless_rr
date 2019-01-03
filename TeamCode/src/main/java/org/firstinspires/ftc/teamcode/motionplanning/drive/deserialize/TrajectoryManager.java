@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Base64;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -31,7 +32,7 @@ public class TrajectoryManager {
         if (!trajectory.equals(previousTrajectory)) {
             previousTrajectory = trajectory;
             try {
-                String decoded = Base64.decode(trajectory, Base64.DEFAULT).toString();
+                String decoded = new String(Base64.decode(trajectory, Base64.DEFAULT), "ISO-8859-1");
                 TrajectoryBuilderWrapper wrapper = mapper.readValue(decoded, TrajectoryBuilderWrapper.class);
                 trajectoryBuilder = wrapper.toTrajectoryBuilder();
                 FileUtils.writeStringToFile(new File(AppUtil.FIRST_FOLDER, wrapper.name + ".trj"), decoded, Charset.defaultCharset());
@@ -44,12 +45,12 @@ public class TrajectoryManager {
         return trajectoryBuilder;
     }
 
-    public static TrajectoryBuilder load(String name) {
+    public static TrajectoryBuilder load(String name, Pose2d poseEstimate) {
         File f = new File(AppUtil.FIRST_FOLDER, name + ".trj");
         try {
             String decoded = FileUtils.readFileToString(f, Charset.defaultCharset());
             TrajectoryBuilderWrapper wrapper = mapper.readValue(decoded, TrajectoryBuilderWrapper.class);
-            trajectoryBuilder = wrapper.toTrajectoryBuilder();
+            trajectoryBuilder = wrapper.toTrajectoryBuilder(poseEstimate);
         }
         catch (Exception e) {
             RobotLog.e(e.toString());
