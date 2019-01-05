@@ -4,5 +4,5 @@ public enum Options {
     lineTo,
     splineTo,
     turnTo,
-    reverse
+    strafeTo, reverse
 }

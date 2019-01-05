@@ -83,7 +83,7 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         graphicsContext = fieldCanvas.getGraphicsContext2D();
 
-        choice.getItems().addAll("lineTo", "splineTo", "turnTo", "reverse");
+        choice.getItems().addAll("lineTo", "splineTo", "turnTo", "reverse", "strafeTo");
         choice.setValue("lineTo");
 
         button.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -286,6 +286,12 @@ public class Controller implements Initializable {
                         break;
                     case turnTo:
                         trajectoryBuilder.turnTo(poses.get(i + 1).getHeading());
+                        break;
+                    case reverse:
+                        trajectoryBuilder.reverse();
+                        break;
+                    case strafeTo:
+                        trajectoryBuilder.strafeTo(poses.get(i + 1).pos());
                         break;
                 }
                 i++;

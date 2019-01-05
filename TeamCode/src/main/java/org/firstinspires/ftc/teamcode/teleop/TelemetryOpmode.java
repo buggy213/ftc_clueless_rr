@@ -176,7 +176,7 @@ public class TelemetryOpmode extends LinearOpMode {
                     speed = Math.abs(gamepad1.right_stick_y) ;
                 }
                 else {
-                    speed = ( Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.right_stick_y) ) / 2;
+                    speed = Math.min( Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.right_stick_y) , 1);
                 }
 
                 double angle = Math.atan2(gamepad1.left_stick_x, -gamepad1.right_stick_y);

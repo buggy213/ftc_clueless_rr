@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
 import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.TrajectoryBuilderExtended;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryManager;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryTransform;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
@@ -124,13 +125,14 @@ public class Autonomous extends LinearOpMode {
                             builder = TrajectoryManager.load("red_depot_left");
                             break;
                         case CENTER:
-                            builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
-                                    .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
+                            // builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
+                            //        .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
+
+                            builder = TrajectoryManager.load("red_depot_center");
                             markerAction = new IntakeAction(4.3, 5.5, rw);
                             break;
                         case RIGHT:
-                            builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -57), 0));
-                            builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-13, -57));
+                            builder = TrajectoryManager.load("red_depot_right");
                             markerAction = new IntakeAction(6.5, 7.7, rw);
                             break;
                     }
@@ -143,32 +145,34 @@ public class Autonomous extends LinearOpMode {
                 case RED_FACING_CRATER:
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
+                            // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
+                            builder = TrajectoryManager.load("red_crater_left");
                             break;
                         case CENTER:
-                            builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
+                            // builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
+                            builder = TrajectoryManager.load("red_crater_center");
                             break;
                         case RIGHT:
-                            builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
+                            // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
+                            builder = TrajectoryManager.load("red_crater_right");
                             break;
                     }
                     break;
                 case BLUE_FACING_DEPOT:
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            builder = builder.splineTo(new Pose2d(new Vector2d(-46, 26), degToRad(135))).splineTo(new Pose2d(new Vector2d(-54.5, 46), degToRad(90)));
-                            builder = builder.splineTo(new Pose2d(new Vector2d(-30, 63), degToRad(0))).turnTo(degToRad(0)).lineTo(new Vector2d(20, 63), new ConstantInterpolator(degToRad(0)));
+                            // builder = builder.splineTo(new Pose2d(new Vector2d(-46, 26), degToRad(135))).splineTo(new Pose2d(new Vector2d(-54.5, 46), degToRad(90)));
+                            // builder = builder.splineTo(new Pose2d(new Vector2d(-30, 63), degToRad(0))).turnTo(degToRad(0)).lineTo(new Vector2d(20, 63), new ConstantInterpolator(degToRad(0)));
+                            builder = TrajectoryManager.load("red_depot_left", TrajectoryTransform.oneEighty());
                             markerAction = new IntakeAction(4.3, 5.5, rw);
                             break;
                         case CENTER:
-                            builder = builder.turnTo(degToRad(135)).splineTo(new Pose2d(new Vector2d(-50, 50), degToRad(90)))
-                                    .splineTo(new Pose2d(new Vector2d(-40, 60), degToRad(0))).turnTo(degToRad(0)).lineTo(new Vector2d(16, 60));
+                            builder = TrajectoryManager.load("red_depot_center", TrajectoryTransform.oneEighty());
                             markerAction = new IntakeAction(4.3, 5.5, rw);
 
                             break;
                         case RIGHT:
-                            builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -57), 0));
-                            builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-13, -57));
+                            builder = TrajectoryManager.load("red_depot_right", TrajectoryTransform.oneEighty());
                             markerAction = new IntakeAction(6.5, 7.7, rw);
                             break;
                     }
@@ -180,13 +184,16 @@ public class Autonomous extends LinearOpMode {
                 case BLUE_FACING_CRATER:
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            builder = builder.turnTo(degToRad(90)).lineTo(new Vector2d(22, 44), new ConstantInterpolator(degToRad(90))).turnTo(degToRad(45));
+                            // builder = builder.turnTo(degToRad(90)).lineTo(new Vector2d(22, 44), new ConstantInterpolator(degToRad(90))).turnTo(degToRad(45));
+                            builder = TrajectoryManager.load("red_crater_left", TrajectoryTransform.oneEighty());
                             break;
                         case CENTER:
-                            builder = builder.turnTo(degToRad(45)).lineTo(new Vector2d(33.5, 33.5), new ConstantInterpolator(degToRad(45)));
+                            // builder = builder.turnTo(degToRad(45)).lineTo(new Vector2d(33.5, 33.5), new ConstantInterpolator(degToRad(45)));
+                            builder = TrajectoryManager.load("red_crater_center", TrajectoryTransform.oneEighty());
                             break;
                         case RIGHT:
-                            builder = builder.turnTo(0).lineTo(new Vector2d(44, 22), new ConstantInterpolator(degToRad(0))).turnTo(degToRad(45));
+                            // builder = builder.turnTo(0).lineTo(new Vector2d(44, 22), new ConstantInterpolator(degToRad(0))).turnTo(degToRad(45));
+                            builder = TrajectoryManager.load("red_crater_right", TrajectoryTransform.oneEighty());
                             break;
                     }
                     break;

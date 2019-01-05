@@ -35,14 +35,18 @@ public class TrajectoryBuilderWrapper {
     }
 
     public TrajectoryBuilder toTrajectoryBuilder() {
-        Pose2dWrapper first = pose2dWrapper.get(0);
-        return toTrajectoryBuilder(new Pose2d(first.x, first.y, first.heading));
+        return toTrajectoryBuilder(TrajectoryTransform.identity());
     }
 
-    public TrajectoryBuilder toTrajectoryBuilder(Pose2d poseEstimate) {
+    public TrajectoryBuilder toTrajectoryBuilder(TrajectoryTransform transform) {
+        Pose2dWrapper first = pose2dWrapper.get(0);
+        return toTrajectoryBuilder(new Pose2d(first.x, first.y, first.heading), transform);
+    }
+
+    public TrajectoryBuilder toTrajectoryBuilder(Pose2d poseEstimate, TrajectoryTransform transform) {
         poses = new ArrayList<>();
         for (Pose2dWrapper pose : pose2dWrapper) {
-            poses.add(new Pose2d(pose.x, pose.y, pose.heading));
+            poses.add(transform.transform(pose));
         }
         constraints = new DriveConstraints(driveConstraintsWrapper.maxVel, driveConstraintsWrapper.maxAcc, driveConstraintsWrapper.maxAngleVel, driveConstraintsWrapper.maxAngleAcc);
 
@@ -61,6 +65,9 @@ public class TrajectoryBuilderWrapper {
                     break;
                 case reverse:
                     trajectoryBuilder.reverse();
+                    break;
+                case strafeTo:
+                    trajectoryBuilder.strafeTo(poses.get(i + 1).pos());
                     break;
             }
             i++;

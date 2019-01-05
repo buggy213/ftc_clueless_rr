@@ -46,25 +46,28 @@ public class TrajectoryManager {
     }
 
     public static TrajectoryBuilder load(String name) {
-        File f = new File(AppUtil.FIRST_FOLDER, name + ".trj");
-        try {
-            String decoded = FileUtils.readFileToString(f, Charset.defaultCharset());
-            TrajectoryBuilderWrapper wrapper = mapper.readValue(decoded, TrajectoryBuilderWrapper.class);
-            trajectoryBuilder = wrapper.toTrajectoryBuilder();
-        }
-        catch (Exception e) {
-            RobotLog.e(e.toString());
-        }
-
-        return trajectoryBuilder;
+        return load(name, null, TrajectoryTransform.identity());
     }
 
-    public static TrajectoryBuilder load(String name, Pose2d poseEstimate) {
+    public static TrajectoryBuilder load(String name, TrajectoryTransform trajectoryTransform) {
+        return load(name, null, trajectoryTransform);
+    }
+
+    public static TrajectoryBuilder load (String name, Pose2d poseEstimate) {
+        return load(name, poseEstimate, TrajectoryTransform.identity());
+    }
+
+    public static TrajectoryBuilder load(String name, Pose2d poseEstimate, TrajectoryTransform trajectoryTransform) {
         File f = new File(AppUtil.FIRST_FOLDER, name + ".trj");
         try {
             String decoded = FileUtils.readFileToString(f, Charset.defaultCharset());
             TrajectoryBuilderWrapper wrapper = mapper.readValue(decoded, TrajectoryBuilderWrapper.class);
-            trajectoryBuilder = wrapper.toTrajectoryBuilder(poseEstimate);
+            if (poseEstimate == null) {
+                trajectoryBuilder = wrapper.toTrajectoryBuilder(trajectoryTransform);
+            }
+            else {
+                trajectoryBuilder = wrapper.toTrajectoryBuilder(poseEstimate, trajectoryTransform);
+            }
         }
         catch (Exception e) {
             RobotLog.e(e.toString());
