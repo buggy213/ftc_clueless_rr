@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.shared;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
@@ -29,13 +30,15 @@ import static org.firstinspires.ftc.teamcode.autonomous.Autonomous.debug;
  * Optimized mecanum drive implementation for REV ExHs. The time savings here are enough to cut loop
  * iteration times in half which may significantly improve trajectory following performance.
  */
+
+@Config
 public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase {
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
-    private static BNO055IMU imu;
+    private BNO055IMU imu;
 
 
-    private final boolean reset = false;
+    public static boolean reset = true;
     private double offset;
 
     PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0, 50);
@@ -49,14 +52,10 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
 
         this.offset = offset;
 
-        // TODO: adjust the names of the following hardware devices to match your configuration
-        if (imu == null || reset) {
-            imu = hardwareMap.get(BNO055IMU.class, "imu");
-            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-            imu.initialize(parameters);
-        }
-
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
         setLocalizer(new MecanumLocalizer(this, true));
 
         leftFront = hardwareMap.get(DcMotorEx.class, "frontLeft");

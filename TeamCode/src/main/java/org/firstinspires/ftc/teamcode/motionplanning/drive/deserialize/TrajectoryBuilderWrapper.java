@@ -35,7 +35,8 @@ public class TrajectoryBuilderWrapper {
     }
 
     public TrajectoryBuilder toTrajectoryBuilder() {
-        return toTrajectoryBuilder(new Pose2d(0,0,0));
+        Pose2dWrapper first = pose2dWrapper.get(0);
+        return toTrajectoryBuilder(new Pose2d(first.x, first.y, first.heading));
     }
 
     public TrajectoryBuilder toTrajectoryBuilder(Pose2d poseEstimate) {
@@ -57,6 +58,9 @@ public class TrajectoryBuilderWrapper {
                     break;
                 case turnTo:
                     trajectoryBuilder.turnTo(poses.get(i + 1).getHeading());
+                    break;
+                case reverse:
+                    trajectoryBuilder.reverse();
                     break;
             }
             i++;

@@ -3,5 +3,6 @@ package sample;
 public enum Options {
     lineTo,
     splineTo,
-    turnTo
+    turnTo,
+    reverse
 }

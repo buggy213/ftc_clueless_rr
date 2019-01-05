@@ -29,8 +29,7 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 
-import java.io.DataOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -64,7 +63,7 @@ public class Controller implements Initializable {
 
     private final double CANVAS_SIZE = 424;
 
-    private DriveConstraints constraints = new DriveConstraints(30, 20, Math.PI / 2, Math.PI / 4);
+    private DriveConstraints constraints = new DriveConstraints(15, 10, Math.PI / 2, Math.PI / 4);
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -84,7 +83,7 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         graphicsContext = fieldCanvas.getGraphicsContext2D();
 
-        choice.getItems().addAll("lineTo", "splineTo", "turnTo");
+        choice.getItems().addAll("lineTo", "splineTo", "turnTo", "reverse");
         choice.setValue("lineTo");
 
         button.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -249,11 +248,20 @@ public class Controller implements Initializable {
         try {
             TrajectoryBuilderWrapper wrapper = new TrajectoryBuilderWrapper(poses, options, constraints, pathName.getText());
             String json = objectMapper.writeValueAsString(wrapper);
-            base64.setText(Base64.getEncoder().encodeToString(json.getBytes()));
+            String encoded = Base64.getEncoder().encodeToString(json.getBytes());
+            base64.setText(encoded);
+            writeFile(pathName.getText() + ".trj", encoded);
         }
         catch (Exception e){
             System.err.println(e.toString());
         }
+    }
+
+    private void writeFile(String fileName, String contents) throws IOException{
+        File f = new File("/trajectories" + fileName);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+        writer.write(contents);
+        writer.close();
     }
 
     private void update() {

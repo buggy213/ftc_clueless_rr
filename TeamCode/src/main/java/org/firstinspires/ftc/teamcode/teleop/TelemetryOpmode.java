@@ -58,8 +58,12 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_SPEED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_ENGAGED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.NARROW_CUBE_CLAW_LEFT;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.NARROW_CUBE_CLAW_RIGHT;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SORTER_OUT;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SORTER_TUCKED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.WIDE_CLAW_LEFT;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.WIDE_CLAW_RIGHT;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -189,6 +193,9 @@ public class TelemetryOpmode extends LinearOpMode {
 
             telemetry.addData("BL", drivetrain.rw.backLeft.getCurrentPosition());
 
+            telemetry.addData("Left stick x", gamepad1.left_stick_x);
+            telemetry.addData("Right stick y", gamepad1.right_stick_y);
+
             telemetry.addData("Linear Slider Position", rw.linearSlider.getCurrentPosition());
 
             //endregion
@@ -203,43 +210,14 @@ public class TelemetryOpmode extends LinearOpMode {
                 manualArmControl = !manualArmControl;
             }
 
-            if (gamepad1.left_bumper) {
-                rw.sorterPivot.setPosition(SORTER_TUCKED);
-            }
-
-            if (gamepad1.right_bumper) {
-                rw.sorterPivot.setPosition(SORTER_OUT);
-            }
-
-            if (gamepad2.x) {
+            if (gamepad1.x) {
                 rw.intakeJoint.setPosition(INTAKE_JOINT_COLLECT);
             }
 
-            if (gamepad2.y) {
+            if (gamepad1.y) {
                 rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
             }
 
-            if (gamepad1.y) {
-                intakeMode = 2;
-            }
-            else if (gamepad1.x){
-                intakeMode = 1;
-            }
-            else if (gamepad1.a) {
-                intakeMode = 0;
-            }
-
-            switch (intakeMode) {
-                case 0:
-                    rw.intake.setPower(INTAKE_SPEED);
-                    break;
-                case 1:
-                    rw.intake.setPower(0);
-                    break;
-                case 2:
-                    rw.intake.setPower(-INTAKE_SPEED);
-                    break;
-            }
             door = gamepad1.b;
             back = gamepad2.back;
 
@@ -267,6 +245,16 @@ public class TelemetryOpmode extends LinearOpMode {
             }
 
             if (gamepad2.dpad_up) {
+                rw.leftClaw.setPosition(NARROW_CUBE_CLAW_LEFT);
+                rw.rightClaw.setPosition(WIDE_CLAW_RIGHT);
+            }
+
+            if (gamepad2.dpad_down) {
+                rw.leftClaw.setPosition(WIDE_CLAW_LEFT);
+                rw.rightClaw.setPosition(NARROW_CUBE_CLAW_RIGHT);
+            }
+
+            if (gamepad1.dpad_up) {
                 rw.leftClaw.setPosition(RobotConstants.NARROW_CUBE_CLAW_LEFT);
                 rw.rightClaw.setPosition(RobotConstants.NARROW_CUBE_CLAW_RIGHT);
             }

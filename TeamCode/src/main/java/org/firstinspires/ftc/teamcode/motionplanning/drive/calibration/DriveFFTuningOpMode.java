@@ -28,8 +28,8 @@ import java.util.List;
 @Config
 @Autonomous
 public class DriveFFTuningOpMode extends LinearOpMode {
-    public static final double MAX_POWER = 0.7;
-    public static final double DISTANCE = 24;
+    public static final double MAX_POWER = 1;
+    public static final double DISTANCE = 72;
 
     @Override
     public void runOpMode() throws InterruptedException {

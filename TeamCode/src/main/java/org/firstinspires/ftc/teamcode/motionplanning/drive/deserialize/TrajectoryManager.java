@@ -45,6 +45,20 @@ public class TrajectoryManager {
         return trajectoryBuilder;
     }
 
+    public static TrajectoryBuilder load(String name) {
+        File f = new File(AppUtil.FIRST_FOLDER, name + ".trj");
+        try {
+            String decoded = FileUtils.readFileToString(f, Charset.defaultCharset());
+            TrajectoryBuilderWrapper wrapper = mapper.readValue(decoded, TrajectoryBuilderWrapper.class);
+            trajectoryBuilder = wrapper.toTrajectoryBuilder();
+        }
+        catch (Exception e) {
+            RobotLog.e(e.toString());
+        }
+
+        return trajectoryBuilder;
+    }
+
     public static TrajectoryBuilder load(String name, Pose2d poseEstimate) {
         File f = new File(AppUtil.FIRST_FOLDER, name + ".trj");
         try {

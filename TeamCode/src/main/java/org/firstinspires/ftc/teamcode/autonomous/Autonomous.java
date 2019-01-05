@@ -40,11 +40,13 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAG
 @Config
 public class Autonomous extends LinearOpMode {
 
-    public static boolean debug = true;
-    public static boolean landed = true;
+    public static boolean debug = false;
+    public static boolean landed = false;
     public static int mineral = 0;
 
-    public static int TIME_GOING_DOWN = 2800;
+    public static int TIME_GOING_DOWN = 2500;
+
+    public static double STRAFE_AMOUNT = 200;
 
     private TFObjectDetector tfod;
     private VuforiaLocalizer vuforia;
@@ -102,14 +104,14 @@ public class Autonomous extends LinearOpMode {
                 matchParameters.mineralConfiguration = position;
             }
 
+            drivetrain.resetEncoders();
 
-
-            /*builder = freshTrajectoryBuilder(drive);
-            builder = builder.strafeRight(Math.sqrt(200));
+            builder = freshTrajectoryBuilder(drive);
+            builder = builder.strafeRight(Math.sqrt(STRAFE_AMOUNT));
             trajectory = builder.build();
             drive.followTrajectory(trajectory);
             waitForTrajectoryFinish(drive, trajectory);
-            */
+
             builder = freshTrajectoryBuilder(drive);
 
             rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
@@ -119,9 +121,7 @@ public class Autonomous extends LinearOpMode {
 
                     switch(matchParameters.mineralConfiguration) {
                         case LEFT:
-                            builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
-                            waitAndDisplayTrajectory(15, FtcDashboard.getInstance(), builder);
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                            builder = TrajectoryManager.load("red_depot_left");
                             break;
                         case CENTER:
                             builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))

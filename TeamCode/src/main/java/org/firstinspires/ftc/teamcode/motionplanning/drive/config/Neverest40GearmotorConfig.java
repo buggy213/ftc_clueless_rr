@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.motionplanning.drive.config;
 
+import com.qualcomm.hardware.motors.NeveRest40Gearmotor;
+
 public class Neverest40GearmotorConfig implements GearmotorConfig{
     @Override
     public int getMaxRPM() {
@@ -8,6 +10,7 @@ public class Neverest40GearmotorConfig implements GearmotorConfig{
 
     @Override
     public int getTicksPerRev() {
-        return 580;
+        return 1120;
     }
+
 }
