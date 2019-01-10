@@ -135,7 +135,14 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
         return ((a % b) + b) % b;
     }
 
-    public void displayPosition(Trajectory trajectory) {
+    public void drawSampledTrajectory(Trajectory trajectory) {
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        TelemetryPacket packet = new TelemetryPacket();
+        DashboardUtil.drawSampledTrajectory(packet.fieldOverlay(), trajectory);
+        dashboard.sendTelemetryPacket(packet);
+    }
+
+    public void displayPosition() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Pose2d currentPose = getPoseEstimate();
 
@@ -148,7 +155,6 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
 
         fieldOverlay.setStrokeWidth(4);
         fieldOverlay.setStroke("green");
-        DashboardUtil.drawSampledTrajectory(fieldOverlay, trajectory);
 
             fieldOverlay.setFill("blue");
             fieldOverlay.fillCircle(currentPose.getX(), currentPose.getY(), 3);

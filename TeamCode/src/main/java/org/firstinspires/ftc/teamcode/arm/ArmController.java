@@ -26,6 +26,10 @@ public class ArmController {
     static final double FIRST_JOINT_GEAR_RATIO = .333333;
     static final double SECOND_JOINT_GEAR_RATIO = .666666;
 
+
+    // Prevent bouncing
+    static final int MAX_CORRECT_AMOUNT = 300;
+
     // Constant which translates encoder ticks to real world rotations (assuming Neverest 60s are used)
     static final double FIRST_JOINT_ENCODER_RATIO = 1680 / FIRST_JOINT_GEAR_RATIO;
     static final double SECOND_JOINT_ENCODER_RATIO = 1680 / SECOND_JOINT_GEAR_RATIO;
@@ -50,7 +54,7 @@ public class ArmController {
     double length = 35.4;
     double angle = 0;
 
-    static final double MANUAL_SPEED = 1;
+    static final double MANUAL_SPEED = 0.6;
 
     double firstJointTarget = 0;
     double secondJointTarget = 0;
@@ -199,6 +203,14 @@ public class ArmController {
 
         double firstJointPower;
         double secondJointPower;
+
+        if (firstJointError > MAX_CORRECT_AMOUNT) {
+            // Reset
+            firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
+        }
+        if (secondJointError > MAX_CORRECT_AMOUNT) {
+            secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
+        }
 
         if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0) {
             firstJointTarget = robotHardware.firstJoint.getCurrentPosition();

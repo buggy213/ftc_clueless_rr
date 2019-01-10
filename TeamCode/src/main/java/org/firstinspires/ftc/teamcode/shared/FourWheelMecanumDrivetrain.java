@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
@@ -172,7 +173,12 @@ public class FourWheelMecanumDrivetrain {
      * @param angle Angle (in radians) that the robot should go
      * @param turn Turning velocity
      */
+
     public void MoveAngle(double speed, double angle, double turn) {
+        MoveAngle(speed, angle, turn, false);
+    }
+
+    public void MoveAngle(double speed, double angle, double turn, boolean maxPower) {
         double vRot = turn;
 
         double desiredAngle = (angle) + Math.PI / 4;
@@ -203,10 +209,15 @@ public class FourWheelMecanumDrivetrain {
         if (Math.abs(leftfront) < speedThreshold) {
             leftfront = 0;
         }
-        setPower(rw.frontRight, rightfront);
-        setPower(rw.frontLeft, leftfront);
-        setPower(rw.backRight, rightBackward * 1.1);
-        setPower(rw.backLeft, leftBackward);
+
+        if (maxPower) {
+            autoScalePower(leftfront, rightfront, leftBackward, rightBackward, speed);
+        } else {
+            setPower(rw.frontRight, rightfront);
+            setPower(rw.frontLeft, leftfront);
+            setPower(rw.backRight, rightBackward);
+            setPower(rw.backLeft, leftBackward);
+        }
     }
 
     public void setPower(DcMotor motor, double speed) {
@@ -251,6 +262,24 @@ public class FourWheelMecanumDrivetrain {
     double normalize(double angle) {
         angle = (360 + angle % 360) % 360;
         return angle;
+    }
+
+    private void autoScalePower(double fl, double fr, double bl, double br, double speed) {
+        double a = Math.abs(fl);
+        double b = Math.abs(fr);
+        double c = Math.abs(bl);
+        double d = Math.abs(br);
+        double absmin = Math.min(a, Math.min(b, Math.min(c, d)));
+        absmin *= speed;
+        fl /= absmin;
+        fr /= absmin;
+        bl /= absmin;
+        br /= absmin;
+
+        setPower(rw.frontRight, fr);
+        setPower(rw.frontLeft, fl);
+        setPower(rw.backRight, br);
+        setPower(rw.backLeft, bl);
     }
 
 }

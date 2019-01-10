@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.motionplanning.drive.calibration;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -15,15 +16,18 @@ import org.firstinspires.ftc.teamcode.motionplanning.util.DashboardUtil;
  * This is a simple routine to test translational drive capabilities. If this is *consistently*
  * overshooting or undershooting by a significant amount, check the constants in the drive class.
  */
+@Config
 @Autonomous
 public class StraightTestOpMode extends LinearOpMode {
+    public static double distance = 48;
+
     @Override
     public void runOpMode() throws InterruptedException {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
 
         Trajectory trajectory = drive.trajectoryBuilder()
-                .forward(48)
+                .forward(distance)
                 .build();
 
         waitForStart();

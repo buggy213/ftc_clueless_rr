@@ -28,15 +28,14 @@ public class DriveConstants {
     public static final Neverest40GearmotorConfig MOTOR_CONFIG = new Neverest40GearmotorConfig();
     private static final double TICKS_PER_REV = MOTOR_CONFIG.getTicksPerRev();
 
-    public static double WHEEL_RADIUS = 1.75; // in
-    public static double GEAR_RATIO = 0.66666666; // output/input
+    public static double WHEEL_RADIUS = 2; // in
+    public static double GEAR_RATIO = 1.5; // output/input
 
-    // TODO figure out why track width calibration outputs 0.51
     public static double TRACK_WIDTH = 12.74; // in
 
     public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(24, 12, Math.PI / 2, Math.PI / 4);
 
-    public static double kV = 0.0618;
+    public static double kV = 0.025;
     public static double kA = 0;
     public static double kStatic = 0;
 

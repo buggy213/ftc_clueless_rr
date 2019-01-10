@@ -170,17 +170,17 @@ public class TelemetryOpmode extends LinearOpMode {
                     speed = 0;
                 }
                 else if ( gamepad1.right_stick_y == 0 ) {
-                    speed = Math.abs(gamepad1.left_stick_x) ;
+                    speed = Math.sqrt(2) * Math.abs(gamepad1.left_stick_x) ;
                 }
                 else if ( gamepad1.left_stick_x == 0 ) {
                     speed = Math.abs(gamepad1.right_stick_y) ;
                 }
                 else {
-                    speed = Math.min( Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.right_stick_y) , 1);
+                    speed = Math.min( Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.right_stick_y), 1);
                 }
 
                 double angle = Math.atan2(gamepad1.left_stick_x, -gamepad1.right_stick_y);
-                drivetrain.MoveAngle(speed, angle, turn);
+                drivetrain.MoveAngle(speed, angle, turn, false);
             } else {
                 drivetrain.stop();
             }

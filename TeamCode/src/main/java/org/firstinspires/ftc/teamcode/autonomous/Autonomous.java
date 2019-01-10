@@ -11,6 +11,8 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.corningrobotics.enderbots.endercv.CameraViewDisplay;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -37,12 +39,12 @@ import java.util.List;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Main Autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Main Autonomous")
 @Config
 public class Autonomous extends LinearOpMode {
 
     public static boolean debug = false;
-    public static boolean landed = false;
+    public static boolean landed = true;
     public static int mineral = 0;
 
     public static int TIME_GOING_DOWN = 2500;
@@ -61,10 +63,13 @@ public class Autonomous extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
-
         RobotHardware rw = new RobotHardware(hardwareMap);
         FourWheelMecanumDrivetrain drivetrain = new FourWheelMecanumDrivetrain(rw);
+
+        drivetrain.resetEncoders();
+
+        RoverRuckusMecanumDriveREVOptimized drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
+
         Parameters matchParameters = SelectParameters.getMatchParameters();
 
         ArmController armController = new ArmController(rw, telemetry, true);
@@ -96,119 +101,113 @@ public class Autonomous extends LinearOpMode {
 
         Trajectory trajectory;
         TrajectoryBuilder builder;
+        if (debug) {
+            matchParameters.mineralConfiguration = Mineral.values()[mineral];
+        } else {
+            matchParameters.mineralConfiguration = position;
+        }
+
+        drivetrain.resetEncoders();
+        builder = freshTrajectoryBuilder(drive);
+        builder = builder.strafeRight(Math.sqrt(STRAFE_AMOUNT));
+        trajectory = builder.build();
+        drive.followTrajectory(trajectory);
+        waitForTrajectoryFinish(drive, trajectory);
+
+        builder = freshTrajectoryBuilder(drive);
+
+        rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
+        IntakeAction markerAction = null;
+        switch (matchParameters.startingPosition) {
+            case RED_FACING_DEPOT:
+
+                switch (matchParameters.mineralConfiguration) {
+                    case LEFT:
+                        builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
+                        break;
+                    case CENTER:
+                        // builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
+                        //        .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
+
+                        builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
+                        markerAction = new IntakeAction(4.3, 5.5, rw);
+                        break;
+                    case RIGHT:
+                        builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
+                        // markerAction = new IntakeAction(6.5, 7.7, rw);
+                        break;
+                }
+                if (markerAction != null) {
+                    Thread marker = new Thread(markerAction);
+                    marker.start();
+                }
+
+                break;
+            case RED_FACING_CRATER:
+                switch (matchParameters.mineralConfiguration) {
+                    case LEFT:
+                        // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
+                        builder = TrajectoryManager.load("red_crater_left");
+                        break;
+                    case CENTER:
+                        // builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
+                        builder = TrajectoryManager.load("red_crater_center");
+                        break;
+                    case RIGHT:
+                        // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
+                        builder = TrajectoryManager.load("red_crater_right");
+                        break;
+                }
+                break;
+            case BLUE_FACING_DEPOT:
+                switch (matchParameters.mineralConfiguration) {
+                    case LEFT:
+                        // builder = builder.splineTo(new Pose2d(new Vector2d(-46, 26), degToRad(135))).splineTo(new Pose2d(new Vector2d(-54.5, 46), degToRad(90)));
+                        // builder = builder.splineTo(new Pose2d(new Vector2d(-30, 63), degToRad(0))).turnTo(degToRad(0)).lineTo(new Vector2d(20, 63), new ConstantInterpolator(degToRad(0)));
+                        builder = TrajectoryManager.load("red_depot_left", TrajectoryTransform.oneEighty());
+                        markerAction = new IntakeAction(4.3, 5.5, rw);
+                        break;
+                    case CENTER:
+                        builder = TrajectoryManager.load("red_depot_center", TrajectoryTransform.oneEighty());
+                        markerAction = new IntakeAction(4.3, 5.5, rw);
+
+                        break;
+                    case RIGHT:
+                        builder = TrajectoryManager.load("red_depot_right", TrajectoryTransform.oneEighty());
+                        markerAction = new IntakeAction(6.5, 7.7, rw);
+                        break;
+                }
+                if (markerAction != null) {
+                    Thread marker = new Thread(markerAction);
+                    marker.start();
+                }
+                break;
+            case BLUE_FACING_CRATER:
+                switch (matchParameters.mineralConfiguration) {
+                    case LEFT:
+                        // builder = builder.turnTo(degToRad(90)).lineTo(new Vector2d(22, 44), new ConstantInterpolator(degToRad(90))).turnTo(degToRad(45));
+                        builder = TrajectoryManager.load("red_crater_left", TrajectoryTransform.oneEighty());
+                        break;
+                    case CENTER:
+                        // builder = builder.turnTo(degToRad(45)).lineTo(new Vector2d(33.5, 33.5), new ConstantInterpolator(degToRad(45)));
+                        builder = TrajectoryManager.load("red_crater_center", TrajectoryTransform.oneEighty());
+                        break;
+                    case RIGHT:
+                        // builder = builder.turnTo(0).lineTo(new Vector2d(44, 22), new ConstantInterpolator(degToRad(0))).turnTo(degToRad(45));
+                        builder = TrajectoryManager.load("red_crater_right", TrajectoryTransform.oneEighty());
+                        break;
+                }
+                break;
+        }
+
+        trajectory = builder.build();
+        drive.followTrajectory(trajectory);
+        waitForTrajectoryFinish(drive, trajectory);
+
+
+        armController.setPositions(750, -750);
         while (opModeIsActive()) {
-
-            if (debug) {
-                matchParameters.mineralConfiguration = Mineral.values()[mineral];
-            }
-            else {
-                matchParameters.mineralConfiguration = position;
-            }
-
-            drivetrain.resetEncoders();
-
-            builder = freshTrajectoryBuilder(drive);
-            builder = builder.strafeRight(Math.sqrt(STRAFE_AMOUNT));
-            trajectory = builder.build();
-            drive.followTrajectory(trajectory);
-            waitForTrajectoryFinish(drive, trajectory);
-
-            builder = freshTrajectoryBuilder(drive);
-
-            rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
-            IntakeAction markerAction = null;
-            switch(matchParameters.startingPosition) {
-                case RED_FACING_DEPOT:
-
-                    switch(matchParameters.mineralConfiguration) {
-                        case LEFT:
-                            builder = TrajectoryManager.load("red_depot_left");
-                            break;
-                        case CENTER:
-                            // builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
-                            //        .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
-
-                            builder = TrajectoryManager.load("red_depot_center");
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
-                            break;
-                        case RIGHT:
-                            builder = TrajectoryManager.load("red_depot_right");
-                            markerAction = new IntakeAction(6.5, 7.7, rw);
-                            break;
-                    }
-                    if (markerAction != null) {
-                        Thread marker = new Thread(markerAction);
-                        marker.start();
-                    }
-
-                    break;
-                case RED_FACING_CRATER:
-                    switch(matchParameters.mineralConfiguration) {
-                        case LEFT:
-                            // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
-                            builder = TrajectoryManager.load("red_crater_left");
-                            break;
-                        case CENTER:
-                            // builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
-                            builder = TrajectoryManager.load("red_crater_center");
-                            break;
-                        case RIGHT:
-                            // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
-                            builder = TrajectoryManager.load("red_crater_right");
-                            break;
-                    }
-                    break;
-                case BLUE_FACING_DEPOT:
-                    switch(matchParameters.mineralConfiguration) {
-                        case LEFT:
-                            // builder = builder.splineTo(new Pose2d(new Vector2d(-46, 26), degToRad(135))).splineTo(new Pose2d(new Vector2d(-54.5, 46), degToRad(90)));
-                            // builder = builder.splineTo(new Pose2d(new Vector2d(-30, 63), degToRad(0))).turnTo(degToRad(0)).lineTo(new Vector2d(20, 63), new ConstantInterpolator(degToRad(0)));
-                            builder = TrajectoryManager.load("red_depot_left", TrajectoryTransform.oneEighty());
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
-                            break;
-                        case CENTER:
-                            builder = TrajectoryManager.load("red_depot_center", TrajectoryTransform.oneEighty());
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
-
-                            break;
-                        case RIGHT:
-                            builder = TrajectoryManager.load("red_depot_right", TrajectoryTransform.oneEighty());
-                            markerAction = new IntakeAction(6.5, 7.7, rw);
-                            break;
-                    }
-                    if (markerAction != null) {
-                        Thread marker = new Thread(markerAction);
-                        marker.start();
-                    }
-                    break;
-                case BLUE_FACING_CRATER:
-                    switch(matchParameters.mineralConfiguration) {
-                        case LEFT:
-                            // builder = builder.turnTo(degToRad(90)).lineTo(new Vector2d(22, 44), new ConstantInterpolator(degToRad(90))).turnTo(degToRad(45));
-                            builder = TrajectoryManager.load("red_crater_left", TrajectoryTransform.oneEighty());
-                            break;
-                        case CENTER:
-                            // builder = builder.turnTo(degToRad(45)).lineTo(new Vector2d(33.5, 33.5), new ConstantInterpolator(degToRad(45)));
-                            builder = TrajectoryManager.load("red_crater_center", TrajectoryTransform.oneEighty());
-                            break;
-                        case RIGHT:
-                            // builder = builder.turnTo(0).lineTo(new Vector2d(44, 22), new ConstantInterpolator(degToRad(0))).turnTo(degToRad(45));
-                            builder = TrajectoryManager.load("red_crater_right", TrajectoryTransform.oneEighty());
-                            break;
-                    }
-                    break;
-            }
-
-            trajectory = builder.build();
-            drive.followTrajectory(trajectory);
-            waitForTrajectoryFinish(drive, trajectory);
-
-
-            armController.setPositions(750, -750);
-            while (opModeIsActive()) {
-                armController.updateArmAuto();
-            }
-
+            armController.updateArmAuto();
         }
     }
 
@@ -217,11 +216,17 @@ public class Autonomous extends LinearOpMode {
     }
 
     void waitForTrajectoryFinish(RoverRuckusMecanumDriveREVOptimized drive, Trajectory trajectory) {
+        double lastUpdate = getRuntime();
+        if (debug) {
+            drive.drawSampledTrajectory(trajectory);
+        }
         while (opModeIsActive() && drive.isFollowingTrajectory()) {
-            if (debug) {
-                drive.displayPosition(trajectory);
-            }
             drive.update();
+            RobotLog.i(String.valueOf(getRuntime() - lastUpdate));
+            lastUpdate = getRuntime();
+            if (debug) {
+                drive.displayPosition();
+            }
         }
     }
 
@@ -252,10 +257,10 @@ public class Autonomous extends LinearOpMode {
         return rad * 180 / Math.PI;
     }
 
-    void waitAndDisplayTrajectory(double time, FtcDashboard dashboard, TrajectoryBuilder trajectoryBuilder){
+    void waitAndDisplayTrajectory(double time, FtcDashboard dashboard, TrajectoryBuilder trajectoryBuilder) {
         Trajectory trajectory = trajectoryBuilder.build();
         resetStartTime();
-        while(getRuntime() < time) {
+        while (getRuntime() < time) {
             TelemetryPacket packet = new TelemetryPacket();
             Canvas fieldOverlay = packet.fieldOverlay();
 
@@ -325,7 +330,7 @@ public class Autonomous extends LinearOpMode {
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 
-    public void land(RobotHardware rw, FourWheelMecanumDrivetrain drivetrain)  throws InterruptedException{
+    public void land(RobotHardware rw, FourWheelMecanumDrivetrain drivetrain) throws InterruptedException {
 
         rw.pawServo.setPosition(LOCK_DISENGAGED);
         Thread.sleep(250);

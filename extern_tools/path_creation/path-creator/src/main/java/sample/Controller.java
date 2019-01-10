@@ -63,7 +63,7 @@ public class Controller implements Initializable {
 
     private final double CANVAS_SIZE = 424;
 
-    private DriveConstraints constraints = new DriveConstraints(15, 10, Math.PI / 2, Math.PI / 4);
+    private DriveConstraints constraints = new DriveConstraints(24, 12, Math.PI / 2, Math.PI / 4);
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -250,7 +250,7 @@ public class Controller implements Initializable {
             String json = objectMapper.writeValueAsString(wrapper);
             String encoded = Base64.getEncoder().encodeToString(json.getBytes());
             base64.setText(encoded);
-            writeFile(pathName.getText() + ".trj", encoded);
+            writeFile(pathName.getText() + ".trj", json);
         }
         catch (Exception e){
             System.err.println(e.toString());
@@ -258,7 +258,7 @@ public class Controller implements Initializable {
     }
 
     private void writeFile(String fileName, String contents) throws IOException{
-        File f = new File("/trajectories" + fileName);
+        File f = new File("trajectories/" + fileName);
         BufferedWriter writer = new BufferedWriter(new FileWriter(f));
         writer.write(contents);
         writer.close();

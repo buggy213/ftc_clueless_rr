@@ -50,7 +50,7 @@ public class TrajectoryBuilderWrapper {
         }
         constraints = new DriveConstraints(driveConstraintsWrapper.maxVel, driveConstraintsWrapper.maxAcc, driveConstraintsWrapper.maxAngleVel, driveConstraintsWrapper.maxAngleAcc);
 
-        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(poseEstimate, constraints, 2500);
+        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(poseEstimate, constraints, 250);
         int i = 0;
         for (Options o : options) {
             switch(o) {
