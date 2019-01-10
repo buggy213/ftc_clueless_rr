@@ -44,7 +44,7 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAG
 public class Autonomous extends LinearOpMode {
 
     public static boolean debug = false;
-    public static boolean landed = true;
+    public static boolean landed = false;
     public static int mineral = 0;
 
     public static int TIME_GOING_DOWN = 2500;

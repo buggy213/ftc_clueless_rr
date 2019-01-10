@@ -35,6 +35,19 @@ public class SamplingPipeline extends OpenCVPipeline {
     public static double idealSolidity = 0.8;
     double maxSolidityDeviation = 0.3;
     double solidityWeight = 1;
+    private Mat cropped;
+    final int tlx = 30;
+    final int tly = 140;
+    final int brx = 1100;
+    final int bry = 464;
+
+    final Point tl = new Point(tlx, tly);
+    final Point br = new Point(brx, bry);
+
+
+    public static int KERNEL_SIZE = 3;
+    private Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*KERNEL_SIZE + 1, 2*KERNEL_SIZE+1));
+
 
     Threshold goldThreshold;
     @Override
@@ -52,12 +65,17 @@ public class SamplingPipeline extends OpenCVPipeline {
     public Mat processFrame(Mat rgba, Mat gray) {
         if (rgba == null || rgba.size() == new Size(0,0))
             return rgba;
-
+        cropped = rgba.submat(new Rect(tl, br));
 
         matOfPoints = new ArrayList<>();
-        Imgproc.cvtColor(rgba, hsv, Imgproc.COLOR_RGB2HSV);
+        Imgproc.cvtColor(cropped, hsv, Imgproc.COLOR_RGB2HSV);
 
         goldThreshold.threshold(hsv, gold);
+
+
+        Imgproc.dilate(gold, gold, kernel);
+        Imgproc.erode(gold, gold, kernel);
+
         Imgproc.findContours(gold, matOfPoints, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         double maxScore = -100;
         bestContour = null;
@@ -82,6 +100,8 @@ public class SamplingPipeline extends OpenCVPipeline {
             samples.add(determinePosition(bestContour, rgba.size().width, rgba));
             plurality = findPlurality(samples);
         }
+
+        Imgproc.rectangle(rgba, tl, br, new Scalar(255, 0, 0), 5);
 
         hierarchy.release();
         for (MatOfPoint contour : matOfPoints) {
