@@ -65,7 +65,13 @@ public class SamplingPipeline extends OpenCVPipeline {
     public Mat processFrame(Mat rgba, Mat gray) {
         if (rgba == null || rgba.size() == new Size(0,0))
             return rgba;
-        cropped = rgba.submat(new Rect(tl, br));
+
+        if (rgba.size().width == 1280 || rgba.size().height == 720) {
+            cropped = rgba.submat(new Rect(tl, br));
+        }
+        else {
+            cropped = rgba;
+        }
 
         matOfPoints = new ArrayList<>();
         Imgproc.cvtColor(cropped, hsv, Imgproc.COLOR_RGB2HSV);
@@ -77,6 +83,7 @@ public class SamplingPipeline extends OpenCVPipeline {
         Imgproc.erode(gold, gold, kernel);
 
         Imgproc.findContours(gold, matOfPoints, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
         double maxScore = -100;
         bestContour = null;
 
@@ -93,7 +100,7 @@ public class SamplingPipeline extends OpenCVPipeline {
         }
         if (bestContour != null) {
             Rect boundingBox = Imgproc.boundingRect(bestContour);
-            Imgproc.rectangle(rgba, boundingBox.tl(), boundingBox.br(), new Scalar(0, 0, 255), 5);
+            Imgproc.rectangle(rgba, addPoints(boundingBox.tl(), tl), addPoints(boundingBox.br(), tl), new Scalar(0, 0, 255), 5);
             Imgproc.putText(rgba, String.valueOf(maxScore), boundingBox.tl(), 0, 1, new Scalar(0, 255, 0));
             if (samples.size() > maxSamples && samples.size() > 0)
                 samples.removeFirst();
@@ -113,6 +120,10 @@ public class SamplingPipeline extends OpenCVPipeline {
         return rgba;
     }
 
+    private Point addPoints(Point p1, Point p2) {
+        return new Point(p1.x + p2.x, p1.y + p2.y);
+    }
+
     public Mineral determinePosition(MatOfPoint contour, double imageX, Mat rgba) {
         if (Imgproc.contourArea(contour) < RobotConstants.CONTOUR_MIN_AREA) {
             return Mineral.RIGHT;
@@ -121,7 +132,7 @@ public class SamplingPipeline extends OpenCVPipeline {
         Moments contourMoments = Imgproc.moments(contour);
         double centroidX = contourMoments.m10 / contourMoments.m00;
         double centroidY = contourMoments.m01 / contourMoments.m00;
-        Imgproc.circle(rgba, new Point(centroidX, centroidY), 3, new Scalar(255,0,0), 3);
+        Imgproc.circle(rgba, addPoints(new Point(centroidX, centroidY), tl), 3, new Scalar(255,0,0), 3);
 
         if (centroidX < imageX / 2) {
             return Mineral.LEFT;
