@@ -11,8 +11,8 @@ public class RobotConstants {
     public static double LOCK_ENGAGED = 0.65;
     public static double LOCK_DISENGAGED = 0.413;
 
-    public static double INTAKE_JOINT_UP = 0.475;
-    public static double INTAKE_JOINT_DOWN = 0.68;
+    public static double INTAKE_JOINT_UP = 0.275;
+    public static double INTAKE_JOINT_DOWN = 0.15;
 
     public static double INTAKE_JOINT_MARKER = 0.7;
     public static double INTAKE_JOINT_COLLECT = 0.68;

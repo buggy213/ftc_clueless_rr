@@ -54,6 +54,7 @@ import java.util.List;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_BLOCK;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_RELEASED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_COLLECT;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_DOWN;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_SPEED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
@@ -212,7 +213,7 @@ public class TelemetryOpmode extends LinearOpMode {
             }
 
             if (gamepad1.x) {
-                rw.intakeJoint.setPosition(INTAKE_JOINT_COLLECT);
+                rw.intakeJoint.setPosition(INTAKE_JOINT_DOWN);
             }
 
             if (gamepad1.y) {
