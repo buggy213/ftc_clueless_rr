@@ -26,7 +26,7 @@ public class SamplingPipeline extends OpenCVPipeline {
     double maxAreaDeviation = 150;
     double areaWeight = 1;
 
-    double maxSamples = 5;
+    double maxSamples = 20;
 
     List<MatOfPoint> matOfPoints;
     Mat hierarchy = new Mat();
@@ -98,15 +98,20 @@ public class SamplingPipeline extends OpenCVPipeline {
                 bestContour = contour;
             }
         }
+
+        Mineral mineralPosition = Mineral.RIGHT;
+
         if (bestContour != null) {
             Rect boundingBox = Imgproc.boundingRect(bestContour);
             Imgproc.rectangle(rgba, addPoints(boundingBox.tl(), tl), addPoints(boundingBox.br(), tl), new Scalar(0, 0, 255), 5);
             Imgproc.putText(rgba, String.valueOf(maxScore), boundingBox.tl(), 0, 1, new Scalar(0, 255, 0));
-            if (samples.size() > maxSamples && samples.size() > 0)
-                samples.removeFirst();
-            samples.add(determinePosition(bestContour, rgba.size().width, rgba));
-            plurality = findPlurality(samples);
+
+            mineralPosition = determinePosition(bestContour, cropped.size().width, rgba);
         }
+        if (samples.size() > maxSamples && samples.size() > 0)
+            samples.removeFirst();
+        samples.add(mineralPosition);
+        plurality = findPlurality(samples);
 
         Imgproc.rectangle(rgba, tl, br, new Scalar(255, 0, 0), 5);
 

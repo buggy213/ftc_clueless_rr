@@ -27,9 +27,6 @@ public class IntakeAction extends TimeBasedAction {
 
     @Override
     public void stop() {
-        rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
-        rw.leftClaw.setPosition(NARROW_CUBE_CLAW_LEFT);
-        rw.rightClaw.setPosition(NARROW_CUBE_CLAW_RIGHT);
         super.stop();
     }
 }

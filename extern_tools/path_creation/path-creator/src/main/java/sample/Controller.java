@@ -22,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import sample.serialize.InputType;
 import sample.serialize.Options;
 import sample.serialize.TrajectoryBuilderWrapper;
 
@@ -65,7 +66,6 @@ public class Controller implements Initializable {
 
     private List<Circle> nodes;
     private List<MovementNode> movementNodes = new ArrayList<>();
-    private Map<Options, Object> optionParameters = new HashMap<>();
 
     private boolean newPose = true;
 
@@ -182,7 +182,11 @@ public class Controller implements Initializable {
                     } else {
                         MovementNode n = movementNodes.get(currentlySelectedIndex);
                         n.actions.add(o);
-                        n.values.add();
+                        ArrayList<Object> tmp = new ArrayList<>();
+                        for (InputType type : o.types) {
+                            tmp.add(InputType.getDefault(type));
+                        }
+                        n.values.add(tmp);
                     }
                 }
 
@@ -261,7 +265,7 @@ public class Controller implements Initializable {
 
         int i = 0;
         for (Circle location : nodes) {
-            poses.set(i, new Pose2d(canvasToFieldSpace(location.getLayoutX(), location.getLayoutY()).pos(), location.getRotate()));
+            movementNodes.get(i).position = new Pose2d(canvasToFieldSpace(location.getLayoutX(), location.getLayoutY()).pos(), location.getRotate()));
             i++;
         }
         i = 0;

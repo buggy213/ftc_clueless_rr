@@ -81,9 +81,7 @@ public class Autonomous extends LinearOpMode {
 
         // TODO make localizer find initial position (instead of relying on hardcoded values)
         drive.getLocalizer().setPoseEstimate(matchParameters.startingPosition.startingPosition);
-        if (Math.abs(drive.getUnnormalizedHeading()) < 0.08) {
-            drive.setOffset(matchParameters.startingPosition.heading);
-        }
+
         TrajectoryManager.update();
 
         while (!isStarted()) {
@@ -98,6 +96,10 @@ public class Autonomous extends LinearOpMode {
         pipeline.disable();
         Mineral position = pipeline.plurality;
 
+        if (Math.abs(drive.getUnnormalizedHeading()) < 0.08) {
+            drive.setOffset(matchParameters.startingPosition.heading);
+        }
+
         if (!landed) {
             land(rw, drivetrain);
         }
@@ -110,7 +112,6 @@ public class Autonomous extends LinearOpMode {
             matchParameters.mineralConfiguration = position;
         }
 
-        drivetrain.resetEncoders();
         builder = freshTrajectoryBuilder(drive);
         builder = builder.strafeRight(Math.sqrt(STRAFE_AMOUNT));
         trajectory = builder.build();
@@ -144,7 +145,7 @@ public class Autonomous extends LinearOpMode {
                         else {
                             builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
                                     .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                            markerAction = new IntakeAction(6, 8, rw);
                         }
                         break;
                     case RIGHT:
@@ -155,7 +156,7 @@ public class Autonomous extends LinearOpMode {
                         else {
                             builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
                             builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
-                            markerAction = new IntakeAction(9, 11, rw);
+                            markerAction = new IntakeAction(7, 9, rw);
                         }
                         break;
                 }
@@ -364,7 +365,7 @@ public class Autonomous extends LinearOpMode {
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2400);
         rw.linearSlider.setPower(1);
-        Thread.sleep(800);
+        Thread.sleep(650);
         AutoMove(-0.25, 0, 250, drivetrain, rw);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rw.linearSlider.setPower(-1);

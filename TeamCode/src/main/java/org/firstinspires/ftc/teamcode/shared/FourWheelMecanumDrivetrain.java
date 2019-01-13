@@ -68,9 +68,18 @@ public class FourWheelMecanumDrivetrain {
         stop();
     }
 
+
+    // DANGER: Using this messes with the MP localizer -- don't do this in between paths
+    
     public void resetEncoders() {
         DcMotor.RunMode runMode = rw.frontLeft.getMode();
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        while (Math.abs(rw.frontLeft.getCurrentPosition()) > 100
+                || Math.abs(rw.frontRight.getCurrentPosition()) > 100
+                || Math.abs(rw.backRight.getCurrentPosition()) > 100
+                || Math.abs(rw.backLeft.getCurrentPosition()) > 100) {
+
+        }
         setMotorMode(runMode);
     }
     public boolean anyIsBusy() {
