@@ -5,8 +5,10 @@ public class Parameters {
     //TODO vision
     public Mineral mineralConfiguration = Mineral.CENTER;
 
+    public boolean parkOpponentCrater = true;
+
     @Override
     public String toString() {
-        return startingPosition.name() + mineralConfiguration.name();
+        return startingPosition.name() + mineralConfiguration.name() + parkOpponentCrater;
     }
 }

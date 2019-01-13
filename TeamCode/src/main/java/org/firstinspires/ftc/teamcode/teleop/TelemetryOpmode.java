@@ -129,6 +129,7 @@ public class TelemetryOpmode extends LinearOpMode {
         drivetrain.resetEncoders();
 
         // drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rw.samplingServo.setPosition(RobotConstants.SAMPLING_SERVO_UP);
 
         rw.frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rw.backRight.setDirection(DcMotorSimple.Direction.REVERSE);

@@ -4,10 +4,8 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,24 +15,19 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
+import sample.serialize.Options;
+import sample.serialize.TrajectoryBuilderWrapper;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
 
@@ -70,9 +63,9 @@ public class Controller implements Initializable {
     private double mouseX;
     private double mouseY;
 
-    private List<Pose2d> poses;
-    private List<Options> options;
     private List<Circle> nodes;
+    private List<MovementNode> movementNodes = new ArrayList<>();
+    private Map<Options, Object> optionParameters = new HashMap<>();
 
     private boolean newPose = true;
 
@@ -82,9 +75,15 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         graphicsContext = fieldCanvas.getGraphicsContext2D();
+        Options[] optionValues = Options.values();
+        String[] optionStrings = new String[optionValues.length];
 
-        choice.getItems().addAll("lineTo", "splineTo", "turnTo", "reverse", "strafeTo");
-        choice.setValue("lineTo");
+        for (int i = 0; i < optionValues.length; i++) {
+            optionStrings[i] = optionValues[i].toString();
+        }
+
+        choice.getItems().addAll(optionStrings);
+        choice.setValue(optionStrings[0]);
 
         button.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -98,7 +97,7 @@ public class Controller implements Initializable {
             public void handle(MouseEvent mouseEvent) {
                 mouseX = mouseEvent.getX();
                 mouseY = mouseEvent.getY();
-                System.out.println(mouseX + "," + mouseY);
+                // System.out.println(mouseX + "," + mouseY);
             }
         });
         main.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -151,52 +150,42 @@ public class Controller implements Initializable {
         fieldPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (poses == null) {
-                    poses = new ArrayList<>();
-                    Circle location = new Circle(4);
-                    location.setStroke(Color.BLUE);
-                    location.setFill(Color.BLUE);
-                    location.relocate(mouseEvent.getX(), mouseEvent.getY());
-                    fieldPane.getChildren().add(location);
-                    location.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent mouseEvent) {
-                            select(location);
-                        }
-                    });
-                    nodes = new ArrayList<>();
-                    nodes.add(location);
+                if (newPose) {
+                    Options o = (Options) (choice.getValue());
+                    if (o.movementAction) {
+                        Circle location = new Circle(4);
+                        location.setStroke(Color.BLUE);
+                        location.setFill(Color.BLUE);
+                        location.relocate(mouseEvent.getX(), mouseEvent.getY());
+                        fieldPane.getChildren().add(location);
+                        location.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent mouseEvent) {
+                                select(location);
+                            }
+                        });
+                        nodes.add(location);
+                        Pose2d pos = canvasToFieldSpace(mouseEvent.getX(), mouseEvent.getY());
+                        MovementNode node = new MovementNode();
+                        node.position = pos;
+                        node.actions.add(o);
+                        ArrayList<Object> tmp = new ArrayList<>();
+                        tmp.add(pos);
+                        node.values.add(tmp);
+                        movementNodes.add(node);
 
-                    poses.add(canvasToFieldSpace(mouseEvent.getX(), mouseEvent.getY()));
+                        update();
 
-                    select(location);
-                }
-                else if (newPose){
-                    Circle location = new Circle(4);
-                    location.setStroke(Color.BLUE);
-                    location.setFill(Color.BLUE);
-                    location.relocate(mouseEvent.getX(), mouseEvent.getY());
-                    fieldPane.getChildren().add(location);
-                    location.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent mouseEvent) {
-                            select(location);
-                        }
-                    });
-                    nodes.add(location);
-                    poses.add(canvasToFieldSpace(mouseEvent.getX(), mouseEvent.getY()));
+                        select(location);
 
-                    if (options == null) {
-                        options = new ArrayList<>();
+                        newPose = false;
+                    } else {
+                        MovementNode n = movementNodes.get(currentlySelectedIndex);
+                        n.actions.add(o);
+                        n.values.add();
                     }
-
-                    options.add(Options.valueOf(choice.getValue().toString()));
-                    update();
-
-                    select(location);
-
-                    newPose = false;
                 }
+
             }
         });
     }
@@ -242,6 +231,10 @@ public class Controller implements Initializable {
              rotation += 2 * Math.PI;
         }
         location.setRotate(rotation);
+    }
+
+    private void load() {
+
     }
 
     private void export() {

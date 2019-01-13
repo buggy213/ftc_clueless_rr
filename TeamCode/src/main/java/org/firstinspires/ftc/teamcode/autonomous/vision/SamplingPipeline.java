@@ -74,10 +74,10 @@ public class SamplingPipeline extends OpenCVPipeline {
         }
 
         matOfPoints = new ArrayList<>();
+        Imgproc.blur(cropped, cropped, new Size(4, 4));
         Imgproc.cvtColor(cropped, hsv, Imgproc.COLOR_RGB2HSV);
 
         goldThreshold.threshold(hsv, gold);
-
 
         Imgproc.dilate(gold, gold, kernel);
         Imgproc.erode(gold, gold, kernel);

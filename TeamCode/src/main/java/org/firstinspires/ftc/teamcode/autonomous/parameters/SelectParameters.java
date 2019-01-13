@@ -21,8 +21,11 @@ public class SelectParameters extends LinearOpMode {
             if (gamepad1.b) matchParameters.startingPosition = StartingPosition.RED_FACING_DEPOT;
             if (gamepad1.x) matchParameters.startingPosition = StartingPosition.BLUE_FACING_CRATER;
             if (gamepad1.y) matchParameters.startingPosition = StartingPosition.BLUE_FACING_DEPOT;
+            if (gamepad1.left_bumper) matchParameters.parkOpponentCrater = true;
+            if (gamepad1.right_bumper) matchParameters.parkOpponentCrater = false;
 
-            telemetry.addData("Starting Position", matchParameters);
+            telemetry.addData("Starting Position", matchParameters.startingPosition);
+            telemetry.addData("Parking at opponent's crater: ", matchParameters.parkOpponentCrater);
             telemetry.update();
         }
     }

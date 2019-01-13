@@ -15,7 +15,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("../../resources/sample.fxml"));
         Scene scene = new Scene(root, 800, 600);
 
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Path Creation Tool");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.corningrobotics.enderbots.endercv.CameraViewDisplay;
@@ -47,7 +48,7 @@ public class Autonomous extends LinearOpMode {
     public static boolean landed = false;
     public static int mineral = 0;
 
-    public static int TIME_GOING_DOWN = 2500;
+    public static int TIME_GOING_DOWN = 2000;
 
     public static double STRAFE_AMOUNT = 200;
 
@@ -80,7 +81,9 @@ public class Autonomous extends LinearOpMode {
 
         // TODO make localizer find initial position (instead of relying on hardcoded values)
         drive.getLocalizer().setPoseEstimate(matchParameters.startingPosition.startingPosition);
-
+        if (Math.abs(drive.getUnnormalizedHeading()) < 0.08) {
+            drive.setOffset(matchParameters.startingPosition.heading);
+        }
         TrajectoryManager.update();
 
         while (!isStarted()) {
@@ -123,18 +126,37 @@ public class Autonomous extends LinearOpMode {
 
                 switch (matchParameters.mineralConfiguration) {
                     case LEFT:
-                        builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
+                        if (matchParameters.parkOpponentCrater) {
+                            builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
+                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                        }
+                        else {
+                            builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
+                            builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-20, -63), new ConstantInterpolator(degToRad(-180)));
+                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                        }
                         break;
                     case CENTER:
-                        // builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
-                        //        .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
-
-                        builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
-                        markerAction = new IntakeAction(4.3, 5.5, rw);
+                        if (matchParameters.parkOpponentCrater) {
+                            builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
+                            markerAction = new IntakeAction(6, 8, rw);
+                        }
+                        else {
+                            builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
+                                    .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
+                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                        }
                         break;
                     case RIGHT:
-                        builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
-                        // markerAction = new IntakeAction(6.5, 7.7, rw);
+                        if (matchParameters.parkOpponentCrater) {
+                            builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
+                            markerAction = new IntakeAction(9, 11, rw);
+                        }
+                        else {
+                            builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
+                            builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
+                            markerAction = new IntakeAction(9, 11, rw);
+                        }
                         break;
                 }
                 if (markerAction != null) {
@@ -165,7 +187,7 @@ public class Autonomous extends LinearOpMode {
                         // builder = builder.splineTo(new Pose2d(new Vector2d(-46, 26), degToRad(135))).splineTo(new Pose2d(new Vector2d(-54.5, 46), degToRad(90)));
                         // builder = builder.splineTo(new Pose2d(new Vector2d(-30, 63), degToRad(0))).turnTo(degToRad(0)).lineTo(new Vector2d(20, 63), new ConstantInterpolator(degToRad(0)));
                         builder = TrajectoryManager.load("red_depot_left", TrajectoryTransform.oneEighty());
-                        markerAction = new IntakeAction(4.3, 5.5, rw);
+                        markerAction = new IntakeAction(6.3, 8.5, rw);
                         break;
                     case CENTER:
                         builder = TrajectoryManager.load("red_depot_center", TrajectoryTransform.oneEighty());
@@ -204,10 +226,9 @@ public class Autonomous extends LinearOpMode {
         drive.followTrajectory(trajectory);
         waitForTrajectoryFinish(drive, trajectory);
 
-
-        armController.setPositions(750, -750);
+        armController.setPositions(-1050, -950);
         while (opModeIsActive()) {
-            armController.updateArmAuto();
+            armController.updateArmAuto(-0.5, 0.5);
         }
     }
 

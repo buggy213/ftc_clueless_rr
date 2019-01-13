@@ -46,7 +46,9 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
     public RoverRuckusMecanumDriveREVOptimized(HardwareMap hardwareMap) {
         this(hardwareMap, 0);
     }
-
+    public void setOffset(double offset) {
+        this.offset = offset;
+    }
     public RoverRuckusMecanumDriveREVOptimized(HardwareMap hardwareMap, double offset) {
         super();
 
@@ -129,6 +131,10 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
     @Override
     public double getExternalHeading() {
         return positiveModulo(imu.getAngularOrientation().firstAngle + offset, 2 * Math.PI);
+    }
+
+    public double getUnnormalizedHeading() {
+        return imu.getAngularOrientation().firstAngle;
     }
 
     public double positiveModulo(double a, double b) {

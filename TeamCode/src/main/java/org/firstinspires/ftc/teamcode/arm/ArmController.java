@@ -278,10 +278,15 @@ public class ArmController {
     }
 
     public void updateArmAuto() {
+        updateArmAuto(-1, 1);
+    }
+    public void updateArmAuto(double min, double max) {
         double firstJointError = firstJointTarget - robotHardware.firstJoint.getCurrentPosition();
         double secondJointError = secondJointTarget - robotHardware.secondJoint.getCurrentPosition();
 
-        robotHardware.firstJoint.setPower(firstJointPID.feedback(firstJointError));
-        robotHardware.secondJoint.setPower(secondJointPID.feedback(secondJointError));
+        double firstJointFeedback = firstJointPID.feedback(firstJointError);
+        double secondJointFeedback = secondJointPID.feedback(secondJointError);
+        robotHardware.firstJoint.setPower(Range.clip(firstJointFeedback, min, max));
+        robotHardware.secondJoint.setPower(Range.clip(secondJointFeedback, min, max));
     }
 }

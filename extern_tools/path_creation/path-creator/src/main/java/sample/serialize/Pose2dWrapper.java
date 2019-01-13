@@ -1,4 +1,4 @@
-package sample;
+package sample.serialize;
 
 import com.acmerobotics.roadrunner.Pose2d;
 
