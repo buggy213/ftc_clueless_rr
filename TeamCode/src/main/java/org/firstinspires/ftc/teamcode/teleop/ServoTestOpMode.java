@@ -22,10 +22,7 @@ public class ServoTestOpMode extends LinearOpMode {
         Servo[] servos = new Servo[]{
             rw.samplingServo,
                 rw.pawServo,
-                rw.intakeJoint,
-                rw.sorterPivot,
-                rw.leftClaw,
-                rw.rightClaw
+                rw.sorterPivot
         };//hardwareMap.getAll(Servo.class);
 
         List<String> servoNames = new ArrayList<>();

@@ -14,20 +14,8 @@ public class RobotConstants {
     public static double INTAKE_JOINT_UP = 0.275;
     public static double INTAKE_JOINT_DOWN = 0.15;
 
-    public static double INTAKE_JOINT_MARKER = 0.7;
-    public static double INTAKE_JOINT_COLLECT = 0.68;
-
-    public static double SORTER_TUCKED = 0.35;
-    public static double SORTER_OUT = 0.8;
-
-    public static double DOOR_BLOCK = 0.53;
-    public static double DOOR_RELEASED = 0.21;
-
     public static double SAMPLING_SERVO_UP = 0.785;
     public static double SAMPLING_SERVO_DOWN = 0.5;
-
-    public static double OPEN_CLAW_LEFT = 0.78;
-    public static double OPEN_CLAW_RIGHT = 0.16;
 
     // Grabbing 2 at once
     public static double WIDE_CLAW_LEFT = 0.69;

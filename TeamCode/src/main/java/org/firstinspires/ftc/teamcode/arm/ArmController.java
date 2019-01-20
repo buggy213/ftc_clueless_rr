@@ -23,21 +23,18 @@ public class ArmController {
     static final double FIRST_JOINT_LENGTH = 18;
     static final double SECOND_JOINT_LENGTH = 17.5;
 
-    static final double FIRST_JOINT_GEAR_RATIO = .333333;
-    static final double SECOND_JOINT_GEAR_RATIO = .666666;
-
 
     // Prevent bouncing
-    static final int MAX_CORRECT_AMOUNT = 300;
+    static final int MAX_CORRECT_AMOUNT = 30;
 
-    // Constant which translates encoder ticks to real world rotations (assuming Neverest 60s are used)
-    static final double FIRST_JOINT_ENCODER_RATIO = 1680 / FIRST_JOINT_GEAR_RATIO;
-    static final double SECOND_JOINT_ENCODER_RATIO = 1680 / SECOND_JOINT_GEAR_RATIO;
+    // Constant which translates encoder ticks to real world rotations
+    static final double FIRST_JOINT_ENCODER_RATIO = 9000;
+    static final double SECOND_JOINT_ENCODER_RATIO = 5040;
 
     static final double rotationFactor = 0.0005;
     static final double horizontalFactor = 0.0025;
 
-    static final double MAX_SPEED = 1;
+    static final double MAX_SPEED = 0.5;
 
     static final int TARGET_TOLERANCE = 50;
     // endregion
@@ -156,13 +153,25 @@ public class ArmController {
         double firstJointPower;
         double secondJointPower;
 
+        if (Math.abs(firstJointError) > MAX_CORRECT_AMOUNT) {
+            // Reset
+            firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
+        }
+        if (Math.abs(secondJointError) > MAX_CORRECT_AMOUNT) {
+            secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
+        }
+
+
+        telemetry.addData("first joint target", firstJointTarget);
+        telemetry.addData("second joint target", secondJointTarget);
+        telemetry.addData("first joint error", firstJointError);
+        telemetry.addData("second joint error", secondJointError);
+
         if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0 && gamepad.right_stick_y == 0 && previousGamepad.right_stick_y != 0) {
             firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
             firstJointPID.reset();
-            firstJointPower = firstJointPID.feedback(firstJointError);
             secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
             secondJointPID.reset();
-            secondJointPower = secondJointPID.feedback(secondJointError);
         }
         else if (gamepad.left_stick_y == 0 && gamepad.right_stick_y == 0) {
             firstJointPower = firstJointPID.feedback(firstJointError);
@@ -173,10 +182,8 @@ public class ArmController {
         else {
             double rotationComponent = gamepad.left_stick_y;
             double lengthComponent = gamepad.right_stick_y;
-            autoScalePower((rotationComponent + lengthComponent) / FIRST_JOINT_GEAR_RATIO, -2 * lengthComponent / SECOND_JOINT_GEAR_RATIO, MAX_SPEED);
+            autoScalePower((rotationComponent + lengthComponent) * FIRST_JOINT_ENCODER_RATIO / SECOND_JOINT_ENCODER_RATIO, lengthComponent, MAX_SPEED);
         }
-
-
 
         try {
             previousGamepad.copy(gamepad);
@@ -204,11 +211,11 @@ public class ArmController {
         double firstJointPower;
         double secondJointPower;
 
-        if (firstJointError > MAX_CORRECT_AMOUNT) {
+        if (Math.abs(firstJointError) > MAX_CORRECT_AMOUNT) {
             // Reset
             firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
         }
-        if (secondJointError > MAX_CORRECT_AMOUNT) {
+        if (Math.abs(secondJointError) > MAX_CORRECT_AMOUNT) {
             secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
         }
 
@@ -227,7 +234,7 @@ public class ArmController {
         if (gamepad.right_stick_y == 0 && previousGamepad.right_stick_y != 0) {
             secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
             secondJointPID.reset();
-            secondJointPower = secondJointPID.feedback(secondJointError);
+            secondJointPower = 0;
         }
         else if (gamepad.right_stick_y == 0){
             secondJointPower = secondJointPID.feedback(secondJointError);
@@ -254,9 +261,22 @@ public class ArmController {
     }
 
     void autoScalePower(double firstJointPower, double secondJointPower, double maxSpeed) {
-        double scaleFactor = Math.max(1 / maxSpeed, Math.max(Math.abs(secondJointPower) / maxSpeed, Math.abs(firstJointPower) / maxSpeed));
-        double scaledFirstJointPower = Math.min(maxSpeed, Math.abs(firstJointPower) / scaleFactor) * Math.signum(firstJointPower);
-        double scaledSecondJointPower = Math.min(maxSpeed, Math.abs(secondJointPower) / scaleFactor) * Math.signum(secondJointPower);
+
+        double scaledFirstJointPower, scaledSecondJointPower;
+
+        if (Math.abs(firstJointPower) > Math.abs(secondJointPower)) {
+            scaledFirstJointPower = maxSpeed * Math.signum(firstJointPower);
+            scaledSecondJointPower = maxSpeed * secondJointPower / Math.abs(firstJointPower);
+        }
+        else {
+            scaledSecondJointPower = maxSpeed * Math.signum(secondJointPower);
+            scaledFirstJointPower = maxSpeed * firstJointPower / Math.abs(secondJointPower);
+        }
+
+
+        telemetry.addData("first joint power", scaledFirstJointPower);
+        telemetry.addData("second joint power", scaledSecondJointPower);
+
         robotHardware.firstJoint.setPower(scaledFirstJointPower);
         robotHardware.secondJoint.setPower(scaledSecondJointPower);
 

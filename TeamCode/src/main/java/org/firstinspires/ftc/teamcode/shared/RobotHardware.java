@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode.shared;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class RobotHardware {
-        public DcMotorEx backLeft, backRight, frontLeft, frontRight, linearSlider, firstJoint, secondJoint, intake;
+        public DcMotorEx backLeft, backRight, frontLeft, frontRight, linearSlider, firstJoint, secondJoint;
 
-        public Servo samplingServo, intakeJoint, pawServo, sorterPivot, leftClaw, rightClaw;
+        public Servo samplingServo, pawServo, sorterPivot, sorterMotor;
+        public CRServo intakeJoint;
         public MotorServo firstJointVirtualServo, secondJointVirtualServo;
 
         public HardwareMap hardwareMap;
@@ -21,14 +23,11 @@ public class RobotHardware {
             linearSlider = (DcMotorEx)hwMap.get(DcMotor.class, "linearSlider");
             firstJoint = (DcMotorEx)hwMap.get(DcMotor.class, "firstJoint");
             secondJoint = (DcMotorEx)hwMap.get(DcMotor.class, "secondJoint");
-            intake = (DcMotorEx)hwMap.get(DcMotor.class, "intake");
 
             samplingServo = hwMap.get(Servo.class, "samplingServo");
-            intakeJoint = hwMap.get(Servo.class, "intakeJoint");
+            intakeJoint = hwMap.get(CRServo.class, "intakeJoint");
             pawServo = hwMap.get(Servo.class, "pawServo");
             sorterPivot = hwMap.get(Servo.class, "sorterPivot");
-            leftClaw = hwMap.get(Servo.class, "left");
-            rightClaw = hwMap.get(Servo.class, "right");
 
             firstJointVirtualServo = new MotorServo(firstJoint, MotorServo.MotorConfiguration.firstJoint);
             secondJointVirtualServo = new MotorServo(secondJoint, MotorServo.MotorConfiguration.secondJoint);

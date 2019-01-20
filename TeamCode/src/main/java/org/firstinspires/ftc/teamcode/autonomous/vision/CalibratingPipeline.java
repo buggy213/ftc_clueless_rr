@@ -28,9 +28,7 @@ public class CalibratingPipeline extends OpenCVPipeline {
 
     private Mat hierarchy = new Mat();
     private List<MatOfPoint> contours = new ArrayList<>();
-    private MatOfPoint contour;
-    private Mat tmp;
-    private Mat visual;
+
     public void setMask(Mat mask) {
         Imgproc.cvtColor(mask, mask, Imgproc.COLOR_BGR2GRAY);
         Imgproc.resize(mask, mask, new Size(1280, 720));

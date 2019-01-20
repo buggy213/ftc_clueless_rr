@@ -40,7 +40,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.arm.ArmController;
 import org.firstinspires.ftc.teamcode.arm.ArmSetpoints;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
@@ -49,22 +48,10 @@ import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 import org.firstinspires.ftc.teamcode.shared.Vuforia;
 
-import java.util.List;
-
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_BLOCK;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_RELEASED;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_COLLECT;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_DOWN;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_SPEED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_ENGAGED;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.NARROW_CUBE_CLAW_LEFT;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.NARROW_CUBE_CLAW_RIGHT;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SORTER_OUT;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SORTER_TUCKED;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.WIDE_CLAW_LEFT;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.WIDE_CLAW_RIGHT;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -86,18 +73,13 @@ public class TelemetryOpmode extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     // Constants for teleop
-    final double turnSpeed = 0.6;
-    final double slowSpeed = 0.8; // 0.8
+    private final double turnSpeed = 0.6;
+    private final double slowSpeed = 0.8; // 0.8
 
-    boolean turningTowards = false;
-    boolean manualArmControl = true;
+    private boolean turningTowards = false;
+    private boolean manualArmControl = true;
 
-    boolean door;
-    boolean doorToggle;
-
-    int intakeMode = 1;
-
-    double previousTimeStamp = 0;
+    private double previousTimeStamp = 0;
 
     private FourWheelMecanumDrivetrain drivetrain;
     private ArmController armController;
@@ -212,15 +194,6 @@ public class TelemetryOpmode extends LinearOpMode {
                 manualArmControl = !manualArmControl;
             }
 
-            if (gamepad1.x) {
-                rw.intakeJoint.setPosition(INTAKE_JOINT_DOWN);
-            }
-
-            if (gamepad1.y) {
-                rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
-            }
-
-            door = gamepad1.b;
             back = gamepad2.back;
 
             rw.linearSlider.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
@@ -236,30 +209,8 @@ public class TelemetryOpmode extends LinearOpMode {
                 armController.setPositions(ArmSetpoints.COLLECT);
             }
 
-            if (gamepad2.dpad_left) {
-                rw.leftClaw.setPosition(RobotConstants.OPEN_CLAW_LEFT);
-                rw.rightClaw.setPosition(RobotConstants.OPEN_CLAW_RIGHT);
-            }
-
-            if (gamepad2.dpad_right) {
-                rw.leftClaw.setPosition(RobotConstants.WIDE_CLAW_LEFT);
-                rw.rightClaw.setPosition(RobotConstants.WIDE_CLAW_RIGHT);
-            }
-
-            if (gamepad2.dpad_up) {
-                rw.leftClaw.setPosition(NARROW_CUBE_CLAW_LEFT);
-                rw.rightClaw.setPosition(WIDE_CLAW_RIGHT);
-            }
-
-            if (gamepad2.dpad_down) {
-                rw.leftClaw.setPosition(WIDE_CLAW_LEFT);
-                rw.rightClaw.setPosition(NARROW_CUBE_CLAW_RIGHT);
-            }
-
-            if (gamepad1.dpad_up) {
-                rw.leftClaw.setPosition(RobotConstants.NARROW_CUBE_CLAW_LEFT);
-                rw.rightClaw.setPosition(RobotConstants.NARROW_CUBE_CLAW_RIGHT);
-            }
+            double intakePower = gamepad2.left_stick_button ? -0.25 : (gamepad2.right_stick_button ? 0.25 : 0);
+            rw.intakeJoint.setPower(intakePower);
 
             if (movingToSetpoint) {
                 armController.updateArmAuto();
@@ -278,6 +229,4 @@ public class TelemetryOpmode extends LinearOpMode {
             previousTimeStamp = runtime.milliseconds();
         }
     }
-
-
 }

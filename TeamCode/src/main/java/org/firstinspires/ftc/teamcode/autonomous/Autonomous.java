@@ -11,8 +11,6 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.corningrobotics.enderbots.endercv.CameraViewDisplay;
@@ -26,13 +24,12 @@ import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
 import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
-import org.firstinspires.ftc.teamcode.motionplanning.drive.TrajectoryBuilderExtended;
+import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryManager;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryTransform;
+import org.firstinspires.ftc.teamcode.motionplanning.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
-import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
-import org.firstinspires.ftc.teamcode.motionplanning.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 
 import java.util.List;
@@ -120,7 +117,6 @@ public class Autonomous extends LinearOpMode {
 
         builder = freshTrajectoryBuilder(drive);
 
-        rw.intakeJoint.setPosition(INTAKE_JOINT_UP);
         IntakeAction markerAction = null;
         switch (matchParameters.startingPosition) {
             case RED_FACING_DEPOT:
@@ -252,7 +248,7 @@ public class Autonomous extends LinearOpMode {
         }
     }
 
-    public void AutoMove(double speed, double angle, int counts, FourWheelMecanumDrivetrain drivetrain, RobotHardware hw) {
+    private void AutoMove(double speed, double angle, int counts, FourWheelMecanumDrivetrain drivetrain, RobotHardware hw) {
         int initialForward = hw.frontLeft.getCurrentPosition();
         int initialBackward = hw.backLeft.getCurrentPosition();
 
@@ -279,7 +275,7 @@ public class Autonomous extends LinearOpMode {
         return rad * 180 / Math.PI;
     }
 
-    void waitAndDisplayTrajectory(double time, FtcDashboard dashboard, TrajectoryBuilder trajectoryBuilder) {
+    private void waitAndDisplayTrajectory(double time, FtcDashboard dashboard, TrajectoryBuilder trajectoryBuilder) {
         Trajectory trajectory = trajectoryBuilder.build();
         resetStartTime();
         while (getRuntime() < time) {

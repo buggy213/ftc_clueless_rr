@@ -19,9 +19,8 @@ public class IntakeAction extends TimeBasedAction {
 
     @Override
     public void start() {
-        rw.intakeJoint.setPosition(INTAKE_JOINT_DOWN);
-        rw.leftClaw.setPosition(WIDE_CLAW_LEFT);
-        rw.rightClaw.setPosition(WIDE_CLAW_RIGHT);
+        // TODO fix marker
+        // rw.intakeJoint.setPosition(INTAKE_JOINT_DOWN);
         super.start();
     }
 

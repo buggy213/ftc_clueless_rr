@@ -37,8 +37,6 @@ public class RoverRuckusMecanumDriveREVOptimized extends SampleMecanumDriveBase 
     private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
-
-    public static boolean reset = true;
     private double offset;
 
     PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0, 50);
