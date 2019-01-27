@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.arm;
 
 public enum ArmSetpoints {
     // TODO find arm setpoints
-    COLLECT(0,0),
-    SCORE(0,0);
+    COLLECT(-900,-300),
+    SCORE(-200,-1800);
 
     int firstJoint;
     int secondJoint;

@@ -21,8 +21,7 @@ public class ServoTestOpMode extends LinearOpMode {
         rw = new RobotHardware(hardwareMap);
         Servo[] servos = new Servo[]{
             rw.samplingServo,
-                rw.pawServo,
-                rw.sorterPivot
+                rw.pawServo
         };//hardwareMap.getAll(Servo.class);
 
         List<String> servoNames = new ArrayList<>();
@@ -31,17 +30,6 @@ public class ServoTestOpMode extends LinearOpMode {
             servoPositions.add(0.5);
             servoNames.add(hardwareMap.getNamesOf(s).iterator().next());
         }
-
-
-        // specifically for this year
-        /*RobotHardware rw = new RobotHardware(hardwareMap);
-        servos.add(rw.firstJointVirtualServo);
-        servos.add(rw.secondJointVirtualServo);
-        servoNames.add("First Joint Virtual Servo");
-        servoNames.add("Second Joint Virtual Servo");
-        servoPositions.add(0d);
-        servoPositions.add(0d);*/
-
 
         waitForStart();
         elapsedTime.reset();

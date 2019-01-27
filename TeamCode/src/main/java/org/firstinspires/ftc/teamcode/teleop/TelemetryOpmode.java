@@ -42,14 +42,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.arm.ArmController;
 import org.firstinspires.ftc.teamcode.arm.ArmSetpoints;
+import org.firstinspires.ftc.teamcode.arm.JointControllerMotor;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 import org.firstinspires.ftc.teamcode.shared.Vuforia;
 
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_DOWN;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_ENGAGED;
 
@@ -85,11 +84,16 @@ public class TelemetryOpmode extends LinearOpMode {
     private ArmController armController;
     private Vuforia vuforia;
     private RoverRuckusMecanumDriveREVOptimized drive;
+    private JointControllerMotor wristController;
 
     public static boolean debugPosition;
 
     private boolean movingToSetpoint;
+    private boolean holdingIntakeAngle;
+    private boolean holdWrist;
+    private int wristTarget;
 
+    int intakeMode = 0;
     @Override
     public void runOpMode() {
         RobotHardware rw = new RobotHardware(hardwareMap);
@@ -107,10 +111,11 @@ public class TelemetryOpmode extends LinearOpMode {
         drivetrain = new FourWheelMecanumDrivetrain(rw);
 
         drivetrain.setMotorZeroPower(DcMotor.ZeroPowerBehavior.BRAKE);
+        rw.intakeJoint.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         drivetrain.setSpeedMultiplier(slowSpeed);
         drivetrain.resetEncoders();
-
+        wristController = new JointControllerMotor(rw);
         // drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rw.samplingServo.setPosition(RobotConstants.SAMPLING_SERVO_UP);
 
@@ -209,12 +214,12 @@ public class TelemetryOpmode extends LinearOpMode {
                 armController.setPositions(ArmSetpoints.COLLECT);
             }
 
-            double intakePower = gamepad2.left_stick_button ? -0.25 : (gamepad2.right_stick_button ? 0.25 : 0);
+            double intakePower = gamepad2.left_stick_button ? -RobotConstants.INTAKE_WRIST_SPEED : (gamepad2.right_stick_button ? RobotConstants.INTAKE_WRIST_SPEED : 0);
             rw.intakeJoint.setPower(intakePower);
 
             if (movingToSetpoint) {
-                armController.updateArmAuto();
-                if (gamepad2.left_stick_y != 0 || gamepad2.right_stick_y != 0) {
+                armController.updateArmAuto(-RobotConstants.MOVE_TO_SETPOINT_SPEED, RobotConstants.MOVE_TO_SETPOINT_SPEED);
+                if (gamepad2.left_stick_y != 0 || gamepad2.right_stick_y != 0 || armController.reachedTarget()) {
                     movingToSetpoint = false;
                 }
             }
@@ -224,9 +229,57 @@ public class TelemetryOpmode extends LinearOpMode {
             else {
                 armController.basicKinematicControl(gamepad2);
             }
+
+            if (gamepad2.dpad_left) {
+                holdingIntakeAngle = true;
+                wristController.setAbsoluteTargetPosition(wristController.getAngle());
+            }
+            if (gamepad2.dpad_right) {
+                holdingIntakeAngle = false;
+                holdWrist = true;
+            }
+            if (gamepad2.x) {
+                intakeMode = 1;
+            }
+            if (gamepad2.y) {
+                intakeMode = 2;
+            }
+            if (gamepad2.dpad_down) {
+                intakeMode = 0;
+            }
+
+
+
+            if (gamepad2.dpad_up) {
+                wristController.setAbsoluteTargetPosition(-31);
+                holdingIntakeAngle = true;
+                holdWrist = false;
+            }
+
+            if (gamepad2.start) {
+                wristController.setAbsoluteTargetPosition(-165);
+                holdingIntakeAngle = true;
+                holdWrist = false;
+            }
+            if (holdWrist && intakePower == 0) {
+                wristController.holdInPlace(wristTarget);
+            }
+            if (intakePower != 0 || Math.abs(wristTarget - rw.intakeJoint.getCurrentPosition()) > 200) {
+                wristTarget = rw.intakeJoint.getCurrentPosition();
+            }
+
+            rw.intake.setPower(intakeMode == 0 ? 0 : intakeMode == 1 ? RobotConstants.SWEEP_SPEED : -RobotConstants.SWEEP_SPEED);
+
+            if (holdingIntakeAngle) {
+                telemetry.addData("feedback", wristController.update());
+            }
+
+            telemetry.addData("Wrist absolute angle", wristController.getAngle());
+
             telemetry.update();
 
             previousTimeStamp = runtime.milliseconds();
+
         }
     }
 }

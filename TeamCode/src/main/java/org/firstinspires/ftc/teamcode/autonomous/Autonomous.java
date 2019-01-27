@@ -223,9 +223,9 @@ public class Autonomous extends LinearOpMode {
         drive.followTrajectory(trajectory);
         waitForTrajectoryFinish(drive, trajectory);
 
-        armController.setPositions(-1050, -950);
+        armController.setPositions(-1050, -1200);
         while (opModeIsActive()) {
-            armController.updateArmAuto(-0.5, 0.5);
+            armController.updateArmAuto(-0.25, 0.25);
         }
     }
 

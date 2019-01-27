@@ -5,6 +5,9 @@ import com.acmerobotics.roadrunner.control.PIDCoefficients;
 
 @Config
 public class RobotConstants {
+    public static double MOVE_TO_SETPOINT_SPEED = 0.2;
+    public static double INTAKE_WRIST_SPEED = 0.5;
+    public static double SWEEP_SPEED = 0.5;
     public static double CONTOUR_MIN_AREA = 500;
 
     // Servo stuff (don't touch)
@@ -14,8 +17,8 @@ public class RobotConstants {
     public static double INTAKE_JOINT_UP = 0.275;
     public static double INTAKE_JOINT_DOWN = 0.15;
 
-    public static double SAMPLING_SERVO_UP = 0.785;
-    public static double SAMPLING_SERVO_DOWN = 0.5;
+    public static double SAMPLING_SERVO_UP = 0.67;
+    public static double SAMPLING_SERVO_DOWN = 0.25;
 
     // Grabbing 2 at once
     public static double WIDE_CLAW_LEFT = 0.69;
@@ -33,4 +36,5 @@ public class RobotConstants {
 
     public static PIDCoefficients FIRST_JOINT_PID = new PIDCoefficients(0.0025, 0,0);
     public static PIDCoefficients SECOND_JOINT_PID = new PIDCoefficients(0.0025, 0,0 );
+    public static double INTAKE_HOLD_ANGLE = 0;
 }
