@@ -265,7 +265,7 @@ public class Controller implements Initializable {
 
         int i = 0;
         for (Circle location : nodes) {
-            movementNodes.get(i).position = new Pose2d(canvasToFieldSpace(location.getLayoutX(), location.getLayoutY()).pos(), location.getRotate()));
+            movementNodes.get(i).position = new Pose2d(canvasToFieldSpace(location.getLayoutX(), location.getLayoutY()).pos(), location.getRotate());
             i++;
         }
         i = 0;

@@ -11,8 +11,9 @@ public class JointControllerMotor extends JointController{
 
     DcMotorEx joint;
     public static double kp = 0;
-    PIDController controller = new PIDController(0.0125, 0, 0);
+    PIDController controller = new PIDController(0.0175, 0, 0);
 
+    double previousError;
     double maxSpeed = 0.75;
 
     public JointControllerMotor(RobotHardware rw) {
@@ -29,9 +30,19 @@ public class JointControllerMotor extends JointController{
     }
 
     public double update() {
-        double feedback = controller.feedback(position - getAngle());
+        double angle = getAngle();
+        // Preventing rollover / spazzyboi
+        if (angle > 90) {
+            angle = -360 + angle;
+        }
+
+
+        double error = position - angle;
+
+        double feedback = controller.feedback(error);
         double power = Range.clip(feedback,-maxSpeed, maxSpeed);
         joint.setPower(-power);
+
         return power;
     }
 

@@ -214,7 +214,7 @@ public class TelemetryOpmode extends LinearOpMode {
                 armController.setPositions(ArmSetpoints.COLLECT);
             }
 
-            double intakePower = gamepad2.left_stick_button ? -RobotConstants.INTAKE_WRIST_SPEED : (gamepad2.right_stick_button ? RobotConstants.INTAKE_WRIST_SPEED : 0);
+            double intakePower = gamepad1.dpad_up ? -RobotConstants.INTAKE_WRIST_SPEED : (gamepad1.dpad_down ? RobotConstants.INTAKE_WRIST_SPEED : 0);
             rw.intakeJoint.setPower(intakePower);
 
             if (movingToSetpoint) {

@@ -253,28 +253,28 @@ public class ArmController {
             secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
         }
 
-        if (gamepad.right_stick_y == 0 && previousGamepad.right_stick_y != 0) {
+        if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0) {
             firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
             firstJointPID.reset();
             firstJointPower = firstJointPID.feedback(firstJointError);
         }
-        else if (gamepad.right_stick_y == 0){
+        else if (gamepad.left_stick_y == 0){
             firstJointPower = firstJointPID.feedback(firstJointError);
         }
         else {
-            firstJointPower = gamepad.right_stick_y;
+            firstJointPower = gamepad.left_stick_y;
         }
 
-        if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0) {
+        if (gamepad.right_stick_y == 0 && previousGamepad.right_stick_y!= 0) {
             secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
             secondJointPID.reset();
             secondJointPower = 0;
         }
-        else if (gamepad.left_stick_y == 0){
+        else if (gamepad.right_stick_y == 0){
             secondJointPower = secondJointPID.feedback(secondJointError);
         }
         else {
-            secondJointPower = gamepad.left_stick_y;
+            secondJointPower = gamepad.right_stick_y;
         }
 
 

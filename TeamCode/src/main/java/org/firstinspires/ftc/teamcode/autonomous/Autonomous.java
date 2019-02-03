@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.autonomous.actions.IntakeAction;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
+import org.firstinspires.ftc.teamcode.autonomous.parameters.StartingPosition;
 import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryManager;
@@ -36,6 +37,7 @@ import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SAMPLING_SERVO_DOWN;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Main Autonomous")
 @Config
@@ -125,34 +127,34 @@ public class Autonomous extends LinearOpMode {
                     case LEFT:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                            markerAction = new IntakeAction(2.3, 4.5, rw);
                         }
                         else {
                             builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
                             builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-20, -63), new ConstantInterpolator(degToRad(-180)));
-                            markerAction = new IntakeAction(4.3, 5.5, rw);
+                            markerAction = new IntakeAction(2.3, 4.5, rw);
                         }
                         break;
                     case CENTER:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(6, 8, rw);
+                            markerAction = new IntakeAction(4, 6, rw);
                         }
                         else {
                             builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
                                     .splineTo(new Pose2d(new Vector2d(40, -62.5), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-16, -62.5));
-                            markerAction = new IntakeAction(6, 8, rw);
+                            markerAction = new IntakeAction(4, 6, rw);
                         }
                         break;
                     case RIGHT:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(9, 11, rw);
+                            markerAction = new IntakeAction(5, 7, rw);
                         }
                         else {
                             builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
                             builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
-                            markerAction = new IntakeAction(7, 9, rw);
+                            markerAction = new IntakeAction(5, 7, rw);
                         }
                         break;
                 }
@@ -222,10 +224,15 @@ public class Autonomous extends LinearOpMode {
         trajectory = builder.build();
         drive.followTrajectory(trajectory);
         waitForTrajectoryFinish(drive, trajectory);
+        if (matchParameters.startingPosition == StartingPosition.RED_FACING_DEPOT && position == Mineral.LEFT) {
+            rw.samplingServo.setPosition(SAMPLING_SERVO_DOWN);
+        }
+        else {
+            //armController.setPositions(-1050, -1200);
+            //while (opModeIsActive()) {
+            //    armController.updateArmAuto(-0.25, 0.25);
+            //}
 
-        armController.setPositions(-1050, -1200);
-        while (opModeIsActive()) {
-            armController.updateArmAuto(-0.25, 0.25);
         }
     }
 
@@ -359,9 +366,9 @@ public class Autonomous extends LinearOpMode {
         rw.linearSlider.setPower(0);
         Thread.sleep(250);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2400);
+        rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2100);
         rw.linearSlider.setPower(1);
-        Thread.sleep(650);
+        Thread.sleep(500);
         AutoMove(-0.25, 0, 250, drivetrain, rw);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rw.linearSlider.setPower(-1);

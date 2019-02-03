@@ -11,6 +11,8 @@ import java.util.LinkedList;
 public abstract class JointController {
     BNO055IMU imu;
 
+    private double offset;
+
     protected static final String IMU_NAME = "jointImu";
     protected static final String JOINT_NAME = "intakeJoint";
     double position;
@@ -26,8 +28,8 @@ public abstract class JointController {
         imu.initialize(parameters);
     }
 
-
+    public void setOffset(double offset) { this.offset = offset; }
     public double getAngle() {
-        return imu.getAngularOrientation().firstAngle;
+        return imu.getAngularOrientation().firstAngle + offset;
     }
 }
