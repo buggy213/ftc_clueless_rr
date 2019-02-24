@@ -36,9 +36,13 @@ public class TimeBasedAction implements Action {
     @Override
     public void update() {
         while (timer.time() < end) {
-
+            updateFunction();
         }
         stop();
+    }
+
+    public void updateFunction() {
+
     }
 
     @Override

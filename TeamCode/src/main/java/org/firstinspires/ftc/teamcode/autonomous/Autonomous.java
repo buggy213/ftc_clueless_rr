@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.arm.ArmController;
 import org.firstinspires.ftc.teamcode.autonomous.actions.IntakeAction;
+import org.firstinspires.ftc.teamcode.autonomous.actions.LinearSliderAction;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
@@ -43,22 +44,14 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SAMPLING_SERV
 @Config
 public class Autonomous extends LinearOpMode {
 
-    public static boolean debug = false;
+    public static boolean debugPosition = true;
+    public static boolean debugMineral = false;
     public static boolean landed = false;
     public static int mineral = 0;
 
-    public static int TIME_GOING_DOWN = 2000;
+    public static int TIME_GOING_DOWN = 2800;
 
     public static double STRAFE_AMOUNT = 200;
-
-    private TFObjectDetector tfod;
-    private VuforiaLocalizer vuforia;
-
-    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
-
-    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -83,7 +76,11 @@ public class Autonomous extends LinearOpMode {
 
         TrajectoryManager.update();
 
+        msStuckDetectStop = 5000;
         while (!isStarted()) {
+            if (isStopRequested()) {
+                return;
+            }
             drive.updatePoseEstimate();
             System.gc();
             telemetry.addData("Ready", "ready");
@@ -92,21 +89,28 @@ public class Autonomous extends LinearOpMode {
             telemetry.addData("Sampling Pipeline Plurality", pipeline.plurality);
             telemetry.update();
         }
-        pipeline.disable();
+        if (isStopRequested()) {
+            return;
+        }
+        else {
+            pipeline.disable();
+        }
         Mineral position = pipeline.plurality;
-
+        resetStartTime();
         if (Math.abs(drive.getUnnormalizedHeading()) < 0.08) {
             drive.setOffset(matchParameters.startingPosition.heading);
         }
 
-        if (!landed) {
+        if (!landed && opModeIsActive()) {
             land(rw, drivetrain);
         }
 
+
         Trajectory trajectory;
         TrajectoryBuilder builder;
-        if (debug) {
+        if (debugMineral) {
             matchParameters.mineralConfiguration = Mineral.values()[mineral];
+            position = Mineral.values()[mineral];
         } else {
             matchParameters.mineralConfiguration = position;
         }
@@ -122,23 +126,22 @@ public class Autonomous extends LinearOpMode {
         IntakeAction markerAction = null;
         switch (matchParameters.startingPosition) {
             case RED_FACING_DEPOT:
-
                 switch (matchParameters.mineralConfiguration) {
                     case LEFT:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(2.3, 4.5, rw);
+                            markerAction = new IntakeAction(4.5, 6.5, rw);
                         }
                         else {
                             builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
-                            builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-20, -63), new ConstantInterpolator(degToRad(-180)));
+                            builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-23.5, -63), new ConstantInterpolator(degToRad(-180)));
                             markerAction = new IntakeAction(2.3, 4.5, rw);
                         }
                         break;
                     case CENTER:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(4, 6, rw);
+                            markerAction = new IntakeAction(3, 5, rw);
                         }
                         else {
                             builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
@@ -149,12 +152,12 @@ public class Autonomous extends LinearOpMode {
                     case RIGHT:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(5, 7, rw);
+                            markerAction = new IntakeAction(5.5, 7.5, rw);
                         }
                         else {
                             builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
                             builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
-                            markerAction = new IntakeAction(5, 7, rw);
+                            markerAction = new IntakeAction(6.5, 8.5, rw);
                         }
                         break;
                 }
@@ -168,15 +171,22 @@ public class Autonomous extends LinearOpMode {
                 switch (matchParameters.mineralConfiguration) {
                     case LEFT:
                         // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
-                        builder = TrajectoryManager.load("red_crater_left");
+                        if (matchParameters.claim) {
+                            builder = TrajectoryManager.load("red_crater_left_claim");
+                        }
+                        else {
+                            builder = TrajectoryManager.load("red_crater_left");
+                        }
                         break;
                     case CENTER:
                         // builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
-                        builder = TrajectoryManager.load("red_crater_center");
+                        if (!matchParameters.claim) builder = TrajectoryManager.load("red_crater_center");
+                        else builder = TrajectoryManager.load("red_crater_center_claim");
                         break;
                     case RIGHT:
                         // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
-                        builder = TrajectoryManager.load("red_crater_right");
+                        if (!matchParameters.claim) builder = TrajectoryManager.load("red_crater_right");
+                        else builder = TrajectoryManager.load("red_crater_right_claim");
                         break;
                 }
                 break;
@@ -190,7 +200,7 @@ public class Autonomous extends LinearOpMode {
                         break;
                     case CENTER:
                         builder = TrajectoryManager.load("red_depot_center", TrajectoryTransform.oneEighty());
-                        markerAction = new IntakeAction(4.3, 5.5, rw);
+                        markerAction = new IntakeAction(3.5, 5.5, rw);
 
                         break;
                     case RIGHT:
@@ -224,15 +234,31 @@ public class Autonomous extends LinearOpMode {
         trajectory = builder.build();
         drive.followTrajectory(trajectory);
         waitForTrajectoryFinish(drive, trajectory);
+
+        // Stop drivetrain fully (could be residual power)
+        drivetrain.stop();
+
+
+        LinearSliderAction linearSliderAction = new LinearSliderAction(0, 1.5, rw);
+        Thread linearSliderThread = new Thread(linearSliderAction);
+        linearSliderThread.start();
+
         if (matchParameters.startingPosition == StartingPosition.RED_FACING_DEPOT && position == Mineral.LEFT) {
             rw.samplingServo.setPosition(SAMPLING_SERVO_DOWN);
         }
         else {
-            //armController.setPositions(-1050, -1200);
-            //while (opModeIsActive()) {
-            //    armController.updateArmAuto(-0.25, 0.25);
-            //}
+            armController.setPositions(-1050, -1200);
+            while (true) {
+                if (isStopRequested()) return;
+                telemetry.addData("Status", "Moving arm down");
+                telemetry.update();
+                armController.updateArmAuto(-1, 1);
+            }
+        }
 
+        while (opModeIsActive()) {
+            telemetry.addData("Status", "Done");
+            telemetry.update();
         }
     }
 
@@ -241,17 +267,22 @@ public class Autonomous extends LinearOpMode {
     }
 
     void waitForTrajectoryFinish(RoverRuckusMecanumDriveREVOptimized drive, Trajectory trajectory) {
+        resetStartTime();
         double lastUpdate = getRuntime();
-        if (debug) {
+        if (debugPosition) {
             drive.drawSampledTrajectory(trajectory);
         }
         while (opModeIsActive() && drive.isFollowingTrajectory()) {
             drive.update();
             RobotLog.i(String.valueOf(getRuntime() - lastUpdate));
             lastUpdate = getRuntime();
-            if (debug) {
+            if (debugPosition) {
                 drive.displayPosition();
             }
+
+            telemetry.addData("Duration", trajectory.duration());
+            telemetry.addData("Time elapsed", getRuntime());
+            telemetry.update();
         }
     }
 
@@ -295,64 +326,6 @@ public class Autonomous extends LinearOpMode {
 
             dashboard.sendTelemetryPacket(packet);
         }
-    }
-
-    public void tfodDetect() {
-        if (tfod != null) {
-            // getUpdatedRecognitions() will return null if no new information is available since
-            // the last time that call was made.
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-            if (updatedRecognitions != null) {
-                telemetry.addData("# Object Detected", updatedRecognitions.size());
-                if (updatedRecognitions.size() == 3) {
-                    int goldMineralX = -1;
-                    int silverMineral1X = -1;
-                    int silverMineral2X = -1;
-                    for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                            goldMineralX = (int) recognition.getLeft();
-                        } else if (silverMineral1X == -1) {
-                            silverMineral1X = (int) recognition.getLeft();
-                        } else {
-                            silverMineral2X = (int) recognition.getLeft();
-                        }
-                    }
-                    if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                        if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                            telemetry.addData("Gold Mineral Position", "Left");
-                        } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                            telemetry.addData("Gold Mineral Position", "Right");
-                        } else {
-                            telemetry.addData("Gold Mineral Position", "Center");
-                        }
-                    }
-                }
-                telemetry.update();
-            }
-        }
-    }
-
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
-    }
-
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 
     public void land(RobotHardware rw, FourWheelMecanumDrivetrain drivetrain) throws InterruptedException {

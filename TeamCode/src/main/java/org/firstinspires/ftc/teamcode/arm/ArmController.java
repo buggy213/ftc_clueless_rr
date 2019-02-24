@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.arm;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
+import com.opencsv.CSVWriter;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,6 +17,9 @@ import org.firstinspires.ftc.teamcode.arm.armkinematics.TwoJointedArmKinematics;
 import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.teleop.TelemetryOpmode;
+
+import java.io.FileWriter;
+import java.io.IOException;
 
 @Config
 public class ArmController {
@@ -70,7 +74,7 @@ public class ArmController {
 
     public void setEnabled(boolean enabled) {
         ArmController.enabled = enabled;
-        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public ArmController(RobotHardware robotHardware, Telemetry telemetry, boolean enabled) {
@@ -245,13 +249,7 @@ public class ArmController {
         double firstJointPower;
         double secondJointPower;
 
-        if (Math.abs(firstJointError) > MAX_CORRECT_AMOUNT) {
-            // Reset
-            firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
-        }
-        if (Math.abs(secondJointError) > MAX_CORRECT_AMOUNT) {
-            secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
-        }
+
 
         if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0) {
             firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
@@ -263,6 +261,11 @@ public class ArmController {
         }
         else {
             firstJointPower = gamepad.left_stick_y;
+            if (Math.abs(firstJointError) > MAX_CORRECT_AMOUNT) {
+                // Reset
+                firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
+            }
+
         }
 
         if (gamepad.right_stick_y == 0 && previousGamepad.right_stick_y!= 0) {
@@ -275,6 +278,9 @@ public class ArmController {
         }
         else {
             secondJointPower = gamepad.right_stick_y;
+            if (Math.abs(secondJointError) > MAX_CORRECT_AMOUNT) {
+                secondJointTarget = robotHardware.secondJoint.getCurrentPosition();
+            }
         }
 
 
@@ -325,6 +331,50 @@ public class ArmController {
         setPositions(setpoint.firstJoint, setpoint.secondJoint);
     }
 
+
+    /**
+     *
+     * @param setpoint
+     * @param delay how long in milliseconds after the first joint starts moving that the second joint will follow (or vise-versa)
+     */
+    public void setPositionsWithDelay(ArmSetpoints setpoint, int delay) {
+        if (delay == 0) {
+            setPositions(setpoint);
+        }
+        if (delay > 0) {
+            setPositions(setpoint.firstJoint, (int)secondJointTarget);
+            Thread moveSecondJoint = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(delay);
+                    }
+                    catch (InterruptedException e) {
+                        return;
+                    }
+                    setPositions(setpoint);
+                }
+            });
+            moveSecondJoint.start();
+        }
+        else {
+            setPositions((int)firstJointTarget, setpoint.secondJoint);
+            Thread moveFirstJoint = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(Math.abs(delay));
+                    }
+                    catch (InterruptedException e) {
+                        return;
+                    }
+                    setPositions(setpoint);
+                }
+            });
+            moveFirstJoint.start();
+        }
+    }
+
     public boolean reachedTarget() {
         boolean firstJoint = Math.abs(firstJointTarget - robotHardware.firstJoint.getCurrentPosition()) < TARGET_TOLERANCE;
         boolean secondJoint = Math.abs(secondJointTarget - robotHardware.firstJoint.getCurrentPosition()) < TARGET_TOLERANCE;
@@ -332,15 +382,75 @@ public class ArmController {
     }
 
     public void updateArmAuto() {
-        updateArmAuto(-1, 1);
+        updateArmAuto(-RobotConstants.MOVE_TO_SETPOINT_SPEED, RobotConstants.MOVE_TO_SETPOINT_SPEED);
     }
     public void updateArmAuto(double min, double max) {
-        double firstJointError = firstJointTarget - robotHardware.firstJoint.getCurrentPosition();
-        double secondJointError = secondJointTarget - robotHardware.secondJoint.getCurrentPosition();
+        updateArmAuto(min, max, false);
+    }
+
+    private double firstJointStartingPosition;
+    private double secondJointStartingPosition;
+    private double wristStartingPosition;
+
+    private void recordStartingPosition() {
+        firstJointStartingPosition = robotHardware.firstJoint.getCurrentPosition();
+        secondJointStartingPosition = robotHardware.secondJoint.getCurrentPosition();
+        wristStartingPosition = robotHardware.intakeJoint.getCurrentPosition();
+    }
+
+    double WRIST_ENCODER_RATIO = 800;
+    double kR = 0.001;
+
+    CSVWriter writer = null;
+    public void logCSV(String[] values) {
+        if (writer == null) {
+            try {
+                writer = new CSVWriter(new FileWriter("/FIRST/log.csv"));
+            } catch (IOException e) {
+                RobotLog.e("Couldn't open csv log file");
+                return;
+            }
+        }
+        writer.writeNext(values);
+    }
+
+    public void closeCSV() {
+        if (writer != null) {
+            try {
+                writer.close();
+            }
+            catch (IOException e) {
+                RobotLog.e("Can't close csv log file");
+            }
+        }
+    }
+
+    public void updateArmAuto(double min, double max, boolean holdWristLevel) {
+        double firstJointPosition = robotHardware.firstJoint.getCurrentPosition();
+        double secondJointPosition = robotHardware.secondJoint.getCurrentPosition();
+        double firstJointError = firstJointTarget - firstJointPosition;
+        double secondJointError = secondJointTarget - secondJointPosition;
 
         double firstJointFeedback = firstJointPID.feedback(firstJointError);
         double secondJointFeedback = secondJointPID.feedback(secondJointError);
+        telemetry.addData("First joint speed", firstJointFeedback);
+        telemetry.addData("Second joint speed", secondJointFeedback);
+        telemetry.addData("First joint position", firstJointPosition);
+        telemetry.addData("Second joint position", secondJointPosition);
+        telemetry.addData("First joint error", firstJointError);
+        telemetry.addData("Second joint error", secondJointError);
+        RobotLog.i(String.valueOf(firstJointFeedback));
+        RobotLog.i(String.valueOf(secondJointFeedback));
         robotHardware.firstJoint.setPower(Range.clip(firstJointFeedback, min, max));
         robotHardware.secondJoint.setPower(Range.clip(secondJointFeedback, min, max));
+    }
+
+    void sweep(double firstJointAngularVelocity) {
+        double secondJointAngularVelocity = 2 * firstJointAngularVelocity;
+        double wristJointAngularVelocity = firstJointAngularVelocity + secondJointAngularVelocity;
+        double firstJointSpeed = firstJointAngularVelocity *  FIRST_JOINT_ENCODER_RATIO;
+        double secondJointSpeed = secondJointAngularVelocity * SECOND_JOINT_ENCODER_RATIO;
+        double wristJointSpeed = wristJointAngularVelocity * WRIST_ENCODER_RATIO;
+
     }
 }

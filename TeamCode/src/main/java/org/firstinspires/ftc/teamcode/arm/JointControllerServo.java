@@ -22,8 +22,8 @@ public class JointControllerServo extends JointController{
     double currentAnglePlurality;
     LinkedList<Double> previousAngles;
 
-    public JointControllerServo(RobotHardware rw) {
-        super(rw);
+    public JointControllerServo(RobotHardware rw, boolean useImu) {
+        super(rw, useImu);
 
         joint = rw.hardwareMap.get(Servo.class, JOINT_NAME);
         previousAngles = new LinkedList<>();

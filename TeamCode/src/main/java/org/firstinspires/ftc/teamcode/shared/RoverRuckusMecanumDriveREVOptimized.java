@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.autonomous.Autonomous.debug;
 
 /*
  * Optimized mecanum drive implementation for REV ExHs. The time savings here are enough to cut loop

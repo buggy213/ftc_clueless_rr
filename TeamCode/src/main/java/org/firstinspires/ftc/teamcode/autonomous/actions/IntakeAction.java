@@ -16,20 +16,27 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.WIDE_CLAW_RIG
 public class IntakeAction extends TimeBasedAction {
     RobotHardware rw;
     JointControllerMotor joint;
+    int delay = 150;
     public IntakeAction(double startTime, double endTime, RobotHardware robotHardware){
         super(startTime, endTime);
         this.rw = robotHardware;
-        joint = new JointControllerMotor(rw);
+        joint = new JointControllerMotor(rw, false);
     }
 
     @Override
     public void start() {
         // TODO fix marker
         // rw.intakeJoint.setPosition(INTAKE_JOINT_DOWN);
-        super.start();
         rw.intakeJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rw.intakeJoint.setTargetPosition(850);
-        rw.intakeJoint.setPower(-0.25);
+        rw.intakeJoint.setTargetPosition(900);
+        rw.intakeJoint.setPower(-0.5);
+        try {
+            Thread.sleep(delay);
+        }
+        catch(InterruptedException e) {
+            stop();
+        }
+        update();
     }
 
     @Override
@@ -37,13 +44,14 @@ public class IntakeAction extends TimeBasedAction {
         while(timer.time() < end) {
             rw.intake.setPower(INTAKE_SPEED * 1.25);
         }
-        rw.intakeJoint.setTargetPosition(0);
-        rw.intakeJoint.setPower(0.25);
         stop();
     }
 
     @Override
     public void stop() {
+        rw.intakeJoint.setTargetPosition(0);
+        rw.intakeJoint.setPower(0.25);
+        rw.intake.setPower(0);
         super.stop();
     }
 }

@@ -15,7 +15,7 @@ public class JointControllerTest extends LinearOpMode {
     public void runOpMode() {
         waitForStart();
         RobotHardware rw = new RobotHardware(hardwareMap);
-        jointController = new JointControllerMotor(rw);
+        jointController = new JointControllerMotor(rw, true);
 
         jointController.setAbsoluteTargetPosition(0);
 

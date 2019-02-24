@@ -12,13 +12,16 @@ public abstract class JointController {
     BNO055IMU imu;
 
     private double offset;
-
+    protected  boolean useImu;
     protected static final String IMU_NAME = "jointImu";
     protected static final String JOINT_NAME = "intakeJoint";
     double position;
 
-    public JointController(RobotHardware rw) {
-        initializeIMU(rw.hardwareMap);
+    public JointController(RobotHardware rw, boolean useImu) {
+        if (useImu) {
+            initializeIMU(rw.hardwareMap);
+            this.useImu = useImu;
+        }
     }
 
     private void initializeIMU(HardwareMap hardwareMap) {

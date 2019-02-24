@@ -16,8 +16,8 @@ public class JointControllerMotor extends JointController{
     double previousError;
     double maxSpeed = 0.75;
 
-    public JointControllerMotor(RobotHardware rw) {
-        super(rw);
+    public JointControllerMotor(RobotHardware rw, boolean useImu) {
+        super(rw, useImu);
         if (kp != 0) {
             controller = new PIDController(kp, 0,0);
         }
@@ -30,7 +30,12 @@ public class JointControllerMotor extends JointController{
     }
 
     public double update() {
+        if (!useImu) {
+            return 0;
+        }
+
         double angle = getAngle();
+
         // Preventing rollover / spazzyboi
         if (angle > 90) {
             angle = -360 + angle;

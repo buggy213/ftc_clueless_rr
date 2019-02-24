@@ -50,9 +50,12 @@ public class TrajectoryBuilderWrapper {
         }
         constraints = new DriveConstraints(driveConstraintsWrapper.maxVel, driveConstraintsWrapper.maxAcc, driveConstraintsWrapper.maxAngleVel, driveConstraintsWrapper.maxAngleAcc);
 
-        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(poseEstimate, constraints, 250);
+        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(poseEstimate, constraints, 100);
         int i = 0;
         for (Options o : options) {
+            // Attempt to make composite wherever possible
+            trajectoryBuilder.beginComposite();
+
             switch(o) {
                 case lineTo:
                     trajectoryBuilder.lineTo(poses.get(i + 1).pos());
@@ -74,4 +77,6 @@ public class TrajectoryBuilderWrapper {
         }
         return trajectoryBuilder;
     }
+
+
 }

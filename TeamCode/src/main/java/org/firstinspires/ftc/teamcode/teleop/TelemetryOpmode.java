@@ -100,8 +100,8 @@ public class TelemetryOpmode extends LinearOpMode {
 
         if (debugPosition) {
             drive = new RoverRuckusMecanumDriveREVOptimized(hardwareMap);
-            vuforia = new Vuforia();
-            vuforia.init(hardwareMap);
+            // vuforia = new Vuforia();
+            // vuforia.init(hardwareMap);
         }
 
         boolean back = false;
@@ -115,7 +115,7 @@ public class TelemetryOpmode extends LinearOpMode {
 
         drivetrain.setSpeedMultiplier(slowSpeed);
         drivetrain.resetEncoders();
-        wristController = new JointControllerMotor(rw);
+        wristController = new JointControllerMotor(rw, false);
         // drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rw.samplingServo.setPosition(RobotConstants.SAMPLING_SERVO_UP);
 
@@ -127,7 +127,7 @@ public class TelemetryOpmode extends LinearOpMode {
         runtime.reset();
 
         if (debugPosition) {
-            vuforia.activateTargets();
+            // vuforia.activateTargets();
         }
 
         // run until the end of the match (driver presses STOP)
@@ -207,15 +207,15 @@ public class TelemetryOpmode extends LinearOpMode {
             if (gamepad2.left_bumper) {
                 movingToSetpoint = true;
                 armController.setPositions(ArmSetpoints.SCORE);
+                wristTarget = 2050;
             }
 
             if (gamepad2.right_bumper) {
                 movingToSetpoint = true;
-                armController.setPositions(ArmSetpoints.COLLECT);
+                // Right now, second joint cannot move as quickly, causing the robot to slam, so add delay to movement of first joint
+                wristTarget = 700;
+                armController.setPositionsWithDelay(ArmSetpoints.COLLECT, -400);
             }
-
-            double intakePower = gamepad1.dpad_up ? -RobotConstants.INTAKE_WRIST_SPEED : (gamepad1.dpad_down ? RobotConstants.INTAKE_WRIST_SPEED : 0);
-            rw.intakeJoint.setPower(intakePower);
 
             if (movingToSetpoint) {
                 armController.updateArmAuto(-RobotConstants.MOVE_TO_SETPOINT_SPEED, RobotConstants.MOVE_TO_SETPOINT_SPEED);
@@ -261,20 +261,29 @@ public class TelemetryOpmode extends LinearOpMode {
                 holdingIntakeAngle = true;
                 holdWrist = false;
             }
+
+            double intakePower = gamepad1.right_bumper ? -RobotConstants.INTAKE_WRIST_SPEED : (gamepad1.left_bumper ? RobotConstants.INTAKE_WRIST_SPEED : 0);
+
+
+            if (!movingToSetpoint) {
+                if (Math.abs(wristTarget - rw.intakeJoint.getCurrentPosition()) > 200) {
+                    wristTarget = rw.intakeJoint.getCurrentPosition();
+                }
+                rw.intakeJoint.setPower(intakePower);
+            }
+
             if (holdWrist && intakePower == 0) {
                 wristController.holdInPlace(wristTarget);
             }
-            if (intakePower != 0 || Math.abs(wristTarget - rw.intakeJoint.getCurrentPosition()) > 200) {
-                wristTarget = rw.intakeJoint.getCurrentPosition();
-            }
 
-            rw.intake.setPower(intakeMode == 0 ? 0 : intakeMode == 1 ? RobotConstants.SWEEP_SPEED : -RobotConstants.SWEEP_SPEED);
+            rw.intake.setPower(intakeMode == 0 ? 0 : intakeMode == 1 ? RobotConstants.SWEEP_SPEED_TELEOP : -RobotConstants.SWEEP_SPEED_TELEOP);
 
             if (holdingIntakeAngle) {
                 telemetry.addData("feedback", wristController.update());
             }
 
-            telemetry.addData("Wrist absolute angle", wristController.getAngle());
+            telemetry.addData("Wrist encoder", rw.intakeJoint.getCurrentPosition());
+            // telemetry.addData("Wrist absolute angle", wristController.getAngle());
 
             telemetry.update();
 

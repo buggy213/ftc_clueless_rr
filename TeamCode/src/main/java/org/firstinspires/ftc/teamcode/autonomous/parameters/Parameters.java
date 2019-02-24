@@ -6,6 +6,7 @@ public class Parameters {
     public Mineral mineralConfiguration = Mineral.CENTER;
 
     public boolean parkOpponentCrater = true;
+    public boolean claim = true;
 
     @Override
     public String toString() {
