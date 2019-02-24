@@ -49,7 +49,7 @@ public class Autonomous extends LinearOpMode {
     public static boolean landed = false;
     public static int mineral = 0;
 
-    public static int TIME_GOING_DOWN = 2800;
+    public static int TIME_GOING_DOWN = 2000;
 
     public static double STRAFE_AMOUNT = 200;
 
@@ -124,6 +124,11 @@ public class Autonomous extends LinearOpMode {
         builder = freshTrajectoryBuilder(drive);
 
         IntakeAction markerAction = null;
+
+
+        boolean depositAtAndReverseEndFlag = false;
+        boolean backServoFlag = false;
+        boolean noExtendArmFlag = false;
         switch (matchParameters.startingPosition) {
             case RED_FACING_DEPOT:
                 switch (matchParameters.mineralConfiguration) {
@@ -136,6 +141,7 @@ public class Autonomous extends LinearOpMode {
                             builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
                             builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-23.5, -63), new ConstantInterpolator(degToRad(-180)));
                             markerAction = new IntakeAction(2.3, 4.5, rw);
+                            backServoFlag = true;
                         }
                         break;
                     case CENTER:
@@ -168,6 +174,10 @@ public class Autonomous extends LinearOpMode {
 
                 break;
             case RED_FACING_CRATER:
+                depositAtAndReverseEndFlag = matchParameters.claim;
+                noExtendArmFlag = matchParameters.claim;
+                backServoFlag = true;
+
                 switch (matchParameters.mineralConfiguration) {
                     case LEFT:
                         // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
@@ -243,10 +253,18 @@ public class Autonomous extends LinearOpMode {
         Thread linearSliderThread = new Thread(linearSliderAction);
         linearSliderThread.start();
 
-        if (matchParameters.startingPosition == StartingPosition.RED_FACING_DEPOT && position == Mineral.LEFT) {
+        if (backServoFlag) {
             rw.samplingServo.setPosition(SAMPLING_SERVO_DOWN);
         }
-        else {
+
+        if (depositAtAndReverseEndFlag) {
+            markerAction = new IntakeAction(0, 2, rw);
+            markerAction.start();
+            Thread.sleep(1750);
+            AutoMove(-0.5, 0, 2000, drivetrain, rw);
+        }
+
+        if (!noExtendArmFlag) {
             armController.setPositions(-1050, -1200);
             while (true) {
                 if (isStopRequested()) return;
@@ -334,7 +352,7 @@ public class Autonomous extends LinearOpMode {
         Thread.sleep(250);
         rw.linearSlider.setPower(-1);
         Thread.sleep(800);
-        rw.linearSlider.setPower(0.45);
+        rw.linearSlider.setPower(1);
         Thread.sleep(TIME_GOING_DOWN);
         rw.linearSlider.setPower(0);
         Thread.sleep(250);
@@ -342,12 +360,12 @@ public class Autonomous extends LinearOpMode {
         rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2100);
         rw.linearSlider.setPower(1);
         Thread.sleep(500);
-        AutoMove(-0.25, 0, 250, drivetrain, rw);
+        AutoMove(-0.5, 0, 250, drivetrain, rw);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rw.linearSlider.setPower(-1);
         Thread.sleep(1500);
         rw.linearSlider.setPower(0);
-        AutoMove(0.25, 0, 250, drivetrain, rw);
+        AutoMove(0.5, 0, 250, drivetrain, rw);
     }
 
 }

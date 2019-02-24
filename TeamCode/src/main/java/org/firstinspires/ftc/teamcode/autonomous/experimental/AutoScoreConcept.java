@@ -58,6 +58,8 @@ public class AutoScoreConcept extends LinearOpMode {
 
     private void sweep() {
         rw.intake.setPower(-SWEEP_SPEED_TELEOP);
-        armController.setPositions(ArmSetpoints.COLLECT_FAR);
+        rw.firstJoint.setPower(-0.2);
+        rw.secondJoint.setPower(0.3);
+
     }
 }
