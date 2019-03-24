@@ -18,8 +18,8 @@ public class RobotConstants {
     public static double INTAKE_JOINT_UP = 0.275;
     public static double INTAKE_JOINT_DOWN = 0.15;
 
-    public static double SAMPLING_SERVO_UP = 0.67;
-    public static double SAMPLING_SERVO_DOWN = 0.20;
+    public static double SAMPLING_SERVO_UP = 0.45;
+    public static double SAMPLING_SERVO_DOWN = 0;
 
     // Grabbing 2 at once
     public static double WIDE_CLAW_LEFT = 0.69;

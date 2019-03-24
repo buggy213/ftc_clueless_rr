@@ -49,7 +49,7 @@ public class Autonomous extends LinearOpMode {
     public static boolean landed = false;
     public static int mineral = 0;
 
-    public static int TIME_GOING_DOWN = 2000;
+    public static int TIME_GOING_DOWN = 2500;
 
     public static double STRAFE_AMOUNT = 200;
 
@@ -135,19 +135,20 @@ public class Autonomous extends LinearOpMode {
                     case LEFT:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(4.5, 6.5, rw);
+                            markerAction = new IntakeAction(3.5, 5.5, rw);
                         }
                         else {
                             builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
                             builder = builder.splineTo(new Pose2d(new Vector2d(30, -63), degToRad(-180))).turnTo(degToRad(-180)).lineTo(new Vector2d(-23.5, -63), new ConstantInterpolator(degToRad(-180)));
                             markerAction = new IntakeAction(2.3, 4.5, rw);
-                            backServoFlag = true;
+
                         }
+                        backServoFlag = true;
                         break;
                     case CENTER:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(3, 5, rw);
+                            markerAction = new IntakeAction(3.8, 5.8, rw);
                         }
                         else {
                             builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
@@ -259,13 +260,14 @@ public class Autonomous extends LinearOpMode {
 
         if (depositAtAndReverseEndFlag) {
             markerAction = new IntakeAction(0, 2, rw);
+            markerAction.setDelay(300);
             markerAction.start();
-            Thread.sleep(1750);
-            AutoMove(-0.5, 0, 2000, drivetrain, rw);
+            Thread.sleep(1000);
+            MoveQuick(-1, 2500, drivetrain, rw);
         }
 
         if (!noExtendArmFlag) {
-            armController.setPositions(-1050, -1200);
+            armController.setPositions(-1200, -1200);
             while (true) {
                 if (isStopRequested()) return;
                 telemetry.addData("Status", "Moving arm down");
@@ -301,6 +303,25 @@ public class Autonomous extends LinearOpMode {
             telemetry.addData("Duration", trajectory.duration());
             telemetry.addData("Time elapsed", getRuntime());
             telemetry.update();
+        }
+    }
+
+    private void MoveQuick(double speed, int counts, FourWheelMecanumDrivetrain drivetrain, RobotHardware hw) {
+        int initialForward = hw.frontLeft.getCurrentPosition();
+        int initialBackward = hw.backLeft.getCurrentPosition();
+
+        drivetrain.setPowerAll(-1);
+
+        while (opModeIsActive()) {
+            int differenceForward = Math.abs(hw.frontLeft.getCurrentPosition() - initialForward);
+            int differenceBackward = Math.abs(hw.backLeft.getCurrentPosition() - initialBackward);
+            telemetry.addData("d1", differenceForward);
+            telemetry.addData("d2", differenceBackward);
+            telemetry.update();
+            if ((differenceBackward + differenceForward) / 2 > counts) {
+                drivetrain.stop();
+                break;
+            }
         }
     }
 
@@ -357,7 +378,7 @@ public class Autonomous extends LinearOpMode {
         rw.linearSlider.setPower(0);
         Thread.sleep(250);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2100);
+        rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2200);
         rw.linearSlider.setPower(1);
         Thread.sleep(500);
         AutoMove(-0.5, 0, 250, drivetrain, rw);

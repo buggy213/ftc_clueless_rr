@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous.vision;
 import com.acmerobotics.dashboard.config.Config;
 
 import org.corningrobotics.enderbots.endercv.OpenCVPipeline;
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
 import org.firstinspires.ftc.teamcode.shared.RobotConstants;
 import org.opencv.core.Mat;

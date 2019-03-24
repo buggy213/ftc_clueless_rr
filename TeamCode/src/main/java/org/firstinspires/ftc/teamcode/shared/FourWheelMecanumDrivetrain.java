@@ -31,7 +31,7 @@ public class FourWheelMecanumDrivetrain {
 
     Orientation angles;
 
-    double speedMultiplier = 0.75;
+    double speedMultiplier = 1;
 
     // Constants used to adjust various parameters / characteristics of the drivetrain
     final double rotSpeed = 0.75;

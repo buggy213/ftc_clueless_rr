@@ -72,8 +72,8 @@ public class TelemetryOpmode extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     // Constants for teleop
-    private final double turnSpeed = 0.6;
-    private final double slowSpeed = 0.8; // 0.8
+    private final double turnSpeed = 1;
+    private final double slowSpeed = 1; // 0.8
 
     private boolean turningTowards = false;
     private boolean manualArmControl = true;
@@ -231,8 +231,8 @@ public class TelemetryOpmode extends LinearOpMode {
             }
 
             if (gamepad2.dpad_left) {
-                holdingIntakeAngle = true;
-                wristController.setAbsoluteTargetPosition(wristController.getAngle());
+                // holdingIntakeAngle = true;
+                // wristController.setAbsoluteTargetPosition(wristController.getAngle());
             }
             if (gamepad2.dpad_right) {
                 holdingIntakeAngle = false;
