@@ -21,6 +21,9 @@ public class RobotConstants {
     public static double SAMPLING_SERVO_UP = 0.45;
     public static double SAMPLING_SERVO_DOWN = 0;
 
+    public static double DOOR_OPEN = 0;
+    public static double DOOR_CLOSED = 1;
+
     // Grabbing 2 at once
     public static double WIDE_CLAW_LEFT = 0.69;
     public static double WIDE_CLAW_RIGHT = 0.29;

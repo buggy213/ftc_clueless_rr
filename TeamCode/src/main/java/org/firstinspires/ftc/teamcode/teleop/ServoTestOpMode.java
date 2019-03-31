@@ -21,7 +21,8 @@ public class ServoTestOpMode extends LinearOpMode {
         rw = new RobotHardware(hardwareMap);
         Servo[] servos = new Servo[]{
             rw.samplingServo,
-                rw.pawServo
+                rw.pawServo,
+                rw.doorServo
         };//hardwareMap.getAll(Servo.class);
 
         List<String> servoNames = new ArrayList<>();

@@ -49,6 +49,8 @@ import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 import org.firstinspires.ftc.teamcode.shared.Vuforia;
 
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_CLOSED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_OPEN;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_ENGAGED;
 
@@ -204,7 +206,7 @@ public class TelemetryOpmode extends LinearOpMode {
             rw.linearSlider.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
 
 
-            if (gamepad2.left_bumper) {
+            /*if (gamepad2.left_bumper) {
                 movingToSetpoint = true;
                 armController.setPositions(ArmSetpoints.SCORE);
                 wristTarget = 2050;
@@ -215,6 +217,14 @@ public class TelemetryOpmode extends LinearOpMode {
                 // Right now, second joint cannot move as quickly, causing the robot to slam, so add delay to movement of first joint
                 wristTarget = 700;
                 armController.setPositionsWithDelay(ArmSetpoints.COLLECT, -400);
+            }*/
+
+            if (gamepad2.left_bumper) {
+                rw.doorServo.setPosition(DOOR_CLOSED);
+            }
+
+            if (gamepad2.right_bumper) {
+                rw.doorServo.setPosition(DOOR_OPEN);
             }
 
             if (movingToSetpoint) {
