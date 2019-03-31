@@ -50,6 +50,7 @@ import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized
 import org.firstinspires.ftc.teamcode.shared.Vuforia;
 
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_CLOSED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_CUBE_RELEASE;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_OPEN;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_ENGAGED;
@@ -240,6 +241,9 @@ public class TelemetryOpmode extends LinearOpMode {
                 armController.basicKinematicControl(gamepad2);
             }
 
+            if (gamepad2.dpad_up) {
+                rw.doorServo.setPosition(DOOR_CUBE_RELEASE);
+            }
             if (gamepad2.dpad_left) {
                 // holdingIntakeAngle = true;
                 // wristController.setAbsoluteTargetPosition(wristController.getAngle());
