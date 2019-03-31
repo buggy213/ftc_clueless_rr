@@ -260,7 +260,7 @@ public class ArmController {
             firstJointPower = firstJointPID.feedback(firstJointError);
         }
         else {
-            firstJointPower = gamepad.left_stick_y;
+            firstJointPower = -gamepad.left_stick_y;
             if (Math.abs(firstJointError) > MAX_CORRECT_AMOUNT) {
                 // Reset
                 firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
