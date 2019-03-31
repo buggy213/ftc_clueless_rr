@@ -84,7 +84,7 @@ public class ArmController {
         robotHardware.secondJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         setEnabled(enabled);
-        robotHardware.firstJoint.setDirection(DcMotorSimple.Direction.REVERSE);
+        robotHardware.firstJoint.setDirection(DcMotorSimple.Direction.FORWARD);
         robotHardware.secondJoint.setDirection(DcMotorSimple.Direction.REVERSE);
         this.telemetry = telemetry;
 

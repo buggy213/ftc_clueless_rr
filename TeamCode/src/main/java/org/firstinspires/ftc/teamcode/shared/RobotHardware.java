@@ -36,8 +36,6 @@ public class RobotHardware {
             firstJointVirtualServo = new MotorServo(firstJoint, MotorServo.MotorConfiguration.firstJoint);
             secondJointVirtualServo = new MotorServo(secondJoint, MotorServo.MotorConfiguration.secondJoint);
 
-            firstJoint.setDirection(DcMotorSimple.Direction.REVERSE);
-
             this.hardwareMap = hwMap;
         }
 
