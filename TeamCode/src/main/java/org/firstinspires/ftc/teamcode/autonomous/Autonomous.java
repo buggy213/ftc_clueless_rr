@@ -14,17 +14,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.corningrobotics.enderbots.endercv.CameraViewDisplay;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.arm.ArmController;
 import org.firstinspires.ftc.teamcode.autonomous.actions.IntakeAction;
+import org.firstinspires.ftc.teamcode.autonomous.actions.LiftArmAction;
 import org.firstinspires.ftc.teamcode.autonomous.actions.LinearSliderAction;
+import org.firstinspires.ftc.teamcode.autonomous.actions.SamplingArmAction;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
-import org.firstinspires.ftc.teamcode.autonomous.parameters.StartingPosition;
 import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryManager;
@@ -34,11 +31,8 @@ import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 
-import java.util.List;
-
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.INTAKE_JOINT_UP;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
-import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SAMPLING_SERVO_DOWN;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.BACK_SERVO_DOWN;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Main Autonomous")
 @Config
@@ -101,6 +95,9 @@ public class Autonomous extends LinearOpMode {
             drive.setOffset(matchParameters.startingPosition.heading);
         }
 
+        LiftArmAction armAction = new LiftArmAction(0, 0.2, rw);
+        Thread armActionThread = new Thread(armAction);
+        armActionThread.start();
         if (!landed && opModeIsActive()) {
             land(rw, drivetrain);
         }
@@ -135,7 +132,7 @@ public class Autonomous extends LinearOpMode {
                     case LEFT:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_left", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(3.5, 5.5, rw);
+                            markerAction = new IntakeAction(3, 5, rw);
                         }
                         else {
                             builder = builder.splineTo(new Pose2d(new Vector2d(46, -26), degToRad(-45))).splineTo(new Pose2d(new Vector2d(54.5, -46), degToRad(-90)));
@@ -157,9 +154,14 @@ public class Autonomous extends LinearOpMode {
                         }
                         break;
                     case RIGHT:
+
                         if (matchParameters.parkOpponentCrater) {
-                            builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(5.5, 7.5, rw);
+                            // builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
+                            // markerAction = new IntakeAction(5.5, 7.5, rw);
+                            builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
+                            builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
+                            markerAction = new IntakeAction(6.5, 8.5, rw);
+
                         }
                         else {
                             builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
@@ -179,11 +181,14 @@ public class Autonomous extends LinearOpMode {
                 noExtendArmFlag = matchParameters.claim;
                 backServoFlag = true;
 
+                SamplingArmAction samplingArmAction = null;
+
                 switch (matchParameters.mineralConfiguration) {
                     case LEFT:
                         // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
                         if (matchParameters.claim) {
-                            builder = TrajectoryManager.load("red_crater_left_claim");
+                            builder = TrajectoryManager.load("red_crater_left_claim_v2");
+                            samplingArmAction = new SamplingArmAction(1.25, 2.75, rw);
                         }
                         else {
                             builder = TrajectoryManager.load("red_crater_left");
@@ -192,13 +197,23 @@ public class Autonomous extends LinearOpMode {
                     case CENTER:
                         // builder = builder.turnTo(degToRad(-135)).lineTo(new Vector2d(-33.5, -33.5), new ConstantInterpolator(degToRad(-135)));
                         if (!matchParameters.claim) builder = TrajectoryManager.load("red_crater_center");
-                        else builder = TrajectoryManager.load("red_crater_center_claim");
+                        else {
+                            builder = TrajectoryManager.load("red_crater_center_claim_v3");
+                            samplingArmAction = new SamplingArmAction(2.5, 3.6, rw);
+                        }
                         break;
                     case RIGHT:
                         // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-44, -22), new ConstantInterpolator(degToRad(-180))).turnTo(degToRad(-135));
                         if (!matchParameters.claim) builder = TrajectoryManager.load("red_crater_right");
-                        else builder = TrajectoryManager.load("red_crater_right_claim");
+                        else {
+                            builder = TrajectoryManager.load("red_crater_right_claim_v2");
+                            samplingArmAction = new SamplingArmAction(1.5, 3.5, rw);
+                        }
                         break;
+                }
+                if  (samplingArmAction != null) {
+                    Thread arm = new Thread(samplingArmAction);
+                    arm.start();
                 }
                 break;
             case BLUE_FACING_DEPOT:
@@ -255,7 +270,7 @@ public class Autonomous extends LinearOpMode {
         linearSliderThread.start();
 
         if (backServoFlag) {
-            rw.samplingServo.setPosition(SAMPLING_SERVO_DOWN);
+            rw.backServo.setPosition(BACK_SERVO_DOWN);
         }
 
         if (depositAtAndReverseEndFlag) {

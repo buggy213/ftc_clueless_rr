@@ -41,7 +41,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.arm.ArmController;
-import org.firstinspires.ftc.teamcode.arm.ArmSetpoints;
 import org.firstinspires.ftc.teamcode.arm.JointControllerMotor;
 import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotConstants;
@@ -120,7 +119,7 @@ public class TelemetryOpmode extends LinearOpMode {
         drivetrain.resetEncoders();
         wristController = new JointControllerMotor(rw, false);
         // drivetrain.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rw.samplingServo.setPosition(RobotConstants.SAMPLING_SERVO_UP);
+        rw.backServo.setPosition(RobotConstants.BACK_SERVO_UP);
 
         rw.frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rw.backRight.setDirection(DcMotorSimple.Direction.REVERSE);

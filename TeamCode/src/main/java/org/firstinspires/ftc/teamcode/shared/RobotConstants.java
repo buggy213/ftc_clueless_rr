@@ -12,14 +12,17 @@ public class RobotConstants {
     public static double CONTOUR_MIN_AREA = 500;
 
     // Servo stuff (don't touch)
-    public static double LOCK_ENGAGED = 0.65;
-    public static double LOCK_DISENGAGED = 0.413;
+    public static double LOCK_ENGAGED = 0.413;
+    public static double LOCK_DISENGAGED = 0.65;
 
     public static double INTAKE_JOINT_UP = 0.275;
     public static double INTAKE_JOINT_DOWN = 0.15;
 
-    public static double SAMPLING_SERVO_UP = 0.45;
-    public static double SAMPLING_SERVO_DOWN = 0;
+    public static double BACK_SERVO_UP = 0.45;
+    public static double BACK_SERVO_DOWN = 0;
+
+    public static double SAMPLING_SERVO_DOWN = 0.45;
+    public static double SAMPLING_SERVO_UP = 0.92;
 
     public static double DOOR_OPEN = 0.46;
     public static double DOOR_CLOSED = 0.86;

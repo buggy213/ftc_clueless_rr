@@ -3,16 +3,13 @@ package org.firstinspires.ftc.teamcode.shared;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.apache.commons.io.input.ReversedLinesFileReader;
 
 public class RobotHardware {
         public DcMotorEx backLeft, backRight, frontLeft, frontRight, linearSlider, firstJoint, secondJoint, intakeJoint;
 
-        public Servo samplingServo, pawServo, doorServo;
+        public Servo backServo, pawServo, doorServo, samplingServo;
         public CRServo intake;
         public MotorServo firstJointVirtualServo, secondJointVirtualServo;
 
@@ -27,7 +24,9 @@ public class RobotHardware {
             firstJoint = (DcMotorEx)hwMap.get(DcMotor.class, "firstJoint");
             secondJoint = (DcMotorEx)hwMap.get(DcMotor.class, "secondJoint");
 
+            backServo = hwMap.get(Servo.class, "backServo");
             samplingServo = hwMap.get(Servo.class, "samplingServo");
+
             intakeJoint = (DcMotorEx)hwMap.get(DcMotor.class, "intakeJoint");
             intake = hwMap.get(CRServo.class, "intake");
             pawServo = hwMap.get(Servo.class, "pawServo");
