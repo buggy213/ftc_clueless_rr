@@ -43,7 +43,7 @@ public class Autonomous extends LinearOpMode {
     public static boolean landed = false;
     public static int mineral = 0;
 
-    public static int TIME_GOING_DOWN = 2500;
+    public static int TIME_GOING_DOWN = 2700;
 
     public static double STRAFE_AMOUNT = 200;
 
@@ -156,11 +156,11 @@ public class Autonomous extends LinearOpMode {
                     case RIGHT:
 
                         if (matchParameters.parkOpponentCrater) {
-                            // builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
-                            // markerAction = new IntakeAction(5.5, 7.5, rw);
-                            builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
-                            builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
-                            markerAction = new IntakeAction(6.5, 8.5, rw);
+                            builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
+                            markerAction = new IntakeAction(5.5, 7.5, rw);
+                            // builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
+                            // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
+                            // markerAction = new IntakeAction(6.5, 8.5, rw);
 
                         }
                         else {
@@ -188,7 +188,7 @@ public class Autonomous extends LinearOpMode {
                         // builder = builder.turnTo(degToRad(-90)).lineTo(new Vector2d(-22, -44), new ConstantInterpolator(degToRad(-90))).turnTo(degToRad(-135));
                         if (matchParameters.claim) {
                             builder = TrajectoryManager.load("red_crater_left_claim_v2");
-                            samplingArmAction = new SamplingArmAction(1.25, 2.75, rw);
+                            samplingArmAction = new SamplingArmAction(1.6, 3.25, rw);
                         }
                         else {
                             builder = TrajectoryManager.load("red_crater_left");
@@ -199,7 +199,7 @@ public class Autonomous extends LinearOpMode {
                         if (!matchParameters.claim) builder = TrajectoryManager.load("red_crater_center");
                         else {
                             builder = TrajectoryManager.load("red_crater_center_claim_v3");
-                            samplingArmAction = new SamplingArmAction(2.5, 3.6, rw);
+                            samplingArmAction = new SamplingArmAction(2.5, 4, rw);
                         }
                         break;
                     case RIGHT:
@@ -383,6 +383,13 @@ public class Autonomous extends LinearOpMode {
     }
 
     public void land(RobotHardware rw, FourWheelMecanumDrivetrain drivetrain) throws InterruptedException {
+        rw.firstJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rw.firstJoint.setTargetPosition(-1100);
+        rw.firstJoint.setPower(1);
+
+        SamplingArmAction samplingArmAction = new SamplingArmAction(0, 2, rw);
+        Thread thread = new Thread(samplingArmAction);
+        thread.start();
 
         rw.pawServo.setPosition(LOCK_DISENGAGED);
         Thread.sleep(250);
@@ -390,11 +397,17 @@ public class Autonomous extends LinearOpMode {
         Thread.sleep(800);
         rw.linearSlider.setPower(1);
         Thread.sleep(TIME_GOING_DOWN);
+
+        rw.firstJoint.setPower(0);
+        rw.firstJoint.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rw.linearSlider.setPower(0);
         Thread.sleep(250);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rw.linearSlider.setTargetPosition(rw.linearSlider.getCurrentPosition() + 2200);
         rw.linearSlider.setPower(1);
+
+
+
         Thread.sleep(500);
         AutoMove(-0.5, 0, 250, drivetrain, rw);
         rw.linearSlider.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

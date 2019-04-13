@@ -124,6 +124,7 @@ public class TelemetryOpmode extends LinearOpMode {
         rw.frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rw.backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        rw.samplingServo.setPosition(RobotConstants.SAMPLING_SERVO_UP);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
