@@ -53,7 +53,7 @@ public class JointControllerMotor extends JointController{
 
     public double holdInPlace(int position) {
         double power = Range.clip(controller.feedback(joint.getCurrentPosition() - position), -maxSpeed, maxSpeed);
-        joint.setPower(-power);
+        joint.setPower(-0.5*power);
         return power;
     }
 }

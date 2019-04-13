@@ -251,10 +251,10 @@ public class TelemetryOpmode extends LinearOpMode {
                 holdingIntakeAngle = false;
                 holdWrist = true;
             }
-            if (gamepad2.x) {
+            if (gamepad2.y) {
                 intakeMode = 1;
             }
-            if (gamepad2.y) {
+            if (gamepad2.x) {
                 intakeMode = 2;
             }
             if (gamepad2.dpad_down) {
