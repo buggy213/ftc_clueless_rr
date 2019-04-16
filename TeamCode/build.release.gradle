@@ -7,8 +7,8 @@ dependencies {
     implementation (name: 'tfod-release', ext:'aar')
     implementation (name: 'opencsv-4.5', ext:'jar')
 
-    implementation 'com.acmerobotics.roadrunner:core:0.2.5'
-    implementation 'com.acmerobotics.dashboard:dashboard:0.2.1'
+    implementation 'com.acmerobotics.roadrunner:core:0.2.6'
+    implementation 'com.acmerobotics.dashboard:dashboard:0.2.4'
     implementation 'org.openftc:rev-extensions-2:1.1'
     implementation project(path: ':openCVLibrary3')
     implementation project(path: ':endercv')

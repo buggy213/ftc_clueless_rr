@@ -53,6 +53,7 @@ import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_CUBE_REL
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.DOOR_OPEN;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_ENGAGED;
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.SWEEP_SPEED_TELEOP;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -79,6 +80,8 @@ public class TelemetryOpmode extends LinearOpMode {
 
     private boolean turningTowards = false;
     private boolean manualArmControl = true;
+
+    private boolean levelWrist;
 
     private double previousTimeStamp = 0;
 
@@ -206,20 +209,6 @@ public class TelemetryOpmode extends LinearOpMode {
 
             rw.linearSlider.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
 
-
-            /*if (gamepad2.left_bumper) {
-                movingToSetpoint = true;
-                armController.setPositions(ArmSetpoints.SCORE);
-                wristTarget = 2050;
-            }
-
-            if (gamepad2.right_bumper) {
-                movingToSetpoint = true;
-                // Right now, second joint cannot move as quickly, causing the robot to slam, so add delay to movement of first joint
-                wristTarget = 700;
-                armController.setPositionsWithDelay(ArmSetpoints.COLLECT, -400);
-            }*/
-
             if (gamepad2.left_bumper) {
                 rw.doorServo.setPosition(DOOR_CLOSED);
             }
@@ -228,12 +217,6 @@ public class TelemetryOpmode extends LinearOpMode {
                 rw.doorServo.setPosition(DOOR_OPEN);
             }
 
-            if (movingToSetpoint) {
-                armController.updateArmAuto(-RobotConstants.MOVE_TO_SETPOINT_SPEED, RobotConstants.MOVE_TO_SETPOINT_SPEED);
-                if (gamepad2.left_stick_y != 0 || gamepad2.right_stick_y != 0 || armController.reachedTarget()) {
-                    movingToSetpoint = false;
-                }
-            }
             else if (manualArmControl) {
                 armController.manualArmControl(gamepad2);
             }
@@ -244,14 +227,7 @@ public class TelemetryOpmode extends LinearOpMode {
             if (gamepad2.dpad_up) {
                 rw.doorServo.setPosition(DOOR_CUBE_RELEASE);
             }
-            if (gamepad2.dpad_left) {
-                // holdingIntakeAngle = true;
-                // wristController.setAbsoluteTargetPosition(wristController.getAngle());
-            }
-            if (gamepad2.dpad_right) {
-                holdingIntakeAngle = false;
-                holdWrist = true;
-            }
+
             if (gamepad2.y) {
                 intakeMode = 1;
             }
@@ -262,35 +238,47 @@ public class TelemetryOpmode extends LinearOpMode {
                 intakeMode = 0;
             }
 
-
-
-            if (gamepad2.dpad_up) {
-                wristController.setAbsoluteTargetPosition(-31);
-                holdingIntakeAngle = true;
+            if (gamepad1.dpad_right) {
                 holdWrist = false;
+                movingToSetpoint = true;
+                levelWrist = false;
             }
 
-            if (gamepad2.start) {
-                wristController.setAbsoluteTargetPosition(-165);
-                holdingIntakeAngle = true;
-                holdWrist = false;
+            if (gamepad1.dpad_up) {
+                levelWrist = true;
+                movingToSetpoint = false;
+            }
+
+            if (levelWrist) {
+                wristController.holdLevel(rw, telemetry);
+            }
+
+            if (movingToSetpoint) {
+                wristController.holdInPlace(1675);
             }
 
             double intakePower = gamepad1.right_bumper ? -RobotConstants.INTAKE_WRIST_SPEED : (gamepad1.left_bumper ? RobotConstants.INTAKE_WRIST_SPEED : 0);
 
-
-            if (!movingToSetpoint) {
-                if (Math.abs(wristTarget - rw.intakeJoint.getCurrentPosition()) > 200) {
+            if (!holdWrist || intakePower != 0) {
+                if (Math.abs(wristTarget - rw.intakeJoint.getCurrentPosition()) > 100) {
                     wristTarget = rw.intakeJoint.getCurrentPosition();
                 }
-                rw.intakeJoint.setPower(intakePower);
+                if  (intakePower != 0) {
+                    movingToSetpoint = false;
+                    levelWrist = false;
+                    rw.intakeJoint.setPower(intakePower);
+                }
+
+                if (intakePower == 0 && !movingToSetpoint && !levelWrist) {
+                    rw.intakeJoint.setPower(0);
+                }
             }
 
             if (holdWrist && intakePower == 0) {
                 wristController.holdInPlace(wristTarget);
             }
 
-            rw.intake.setPower(intakeMode == 0 ? 0 : intakeMode == 1 ? RobotConstants.SWEEP_SPEED_TELEOP : -RobotConstants.SWEEP_SPEED_TELEOP);
+            intakeControl(rw);
 
             if (holdingIntakeAngle) {
                 telemetry.addData("feedback", wristController.update());
@@ -304,5 +292,27 @@ public class TelemetryOpmode extends LinearOpMode {
             previousTimeStamp = runtime.milliseconds();
 
         }
+
+    }
+
+    private boolean unclog;
+    private double timestamp;
+    private double length = 0.35;
+    private void intakeControl(RobotHardware rw) {
+
+        if (gamepad2.dpad_left) {
+            unclog = true;
+            timestamp = getRuntime();
+        }
+        if(!unclog) {
+            rw.intake.setPower(intakeMode == 0 ? 0 : intakeMode == 1 ? RobotConstants.SWEEP_SPEED_TELEOP : -RobotConstants.SWEEP_SPEED_TELEOP);
+        }
+        else {
+            if (getRuntime() - timestamp > length) {
+                unclog = false;
+            }
+            rw.intake.setPower(-SWEEP_SPEED_TELEOP);
+        }
+
     }
 }

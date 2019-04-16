@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.autonomous.actions.SamplingArmAction;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Mineral;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.Parameters;
 import org.firstinspires.ftc.teamcode.autonomous.parameters.SelectParameters;
+import org.firstinspires.ftc.teamcode.autonomous.parameters.StartingPosition;
 import org.firstinspires.ftc.teamcode.autonomous.vision.SamplingPipeline;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.config.DriveConstants;
 import org.firstinspires.ftc.teamcode.motionplanning.drive.deserialize.TrajectoryManager;
@@ -31,6 +32,7 @@ import org.firstinspires.ftc.teamcode.shared.FourWheelMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.shared.RobotHardware;
 import org.firstinspires.ftc.teamcode.shared.RoverRuckusMecanumDriveREVOptimized;
 
+import static org.firstinspires.ftc.teamcode.shared.RobotConstants.BACK_SERVO_UP;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.LOCK_DISENGAGED;
 import static org.firstinspires.ftc.teamcode.shared.RobotConstants.BACK_SERVO_DOWN;
 
@@ -91,6 +93,10 @@ public class Autonomous extends LinearOpMode {
         }
         Mineral position = pipeline.plurality;
         resetStartTime();
+
+        if (position == Mineral.LEFT && matchParameters.startingPosition == StartingPosition.RED_FACING_DEPOT)
+            Thread.sleep(5000);
+
         if (Math.abs(drive.getUnnormalizedHeading()) < 0.08) {
             drive.setOffset(matchParameters.startingPosition.heading);
         }
@@ -141,11 +147,12 @@ public class Autonomous extends LinearOpMode {
 
                         }
                         backServoFlag = true;
+                        noExtendArmFlag = true;
                         break;
                     case CENTER:
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_center", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(3.8, 5.8, rw);
+                            markerAction = new IntakeAction(4.8, 6.8, rw);
                         }
                         else {
                             builder = builder.turnTo(degToRad(-45)).splineTo(new Pose2d(new Vector2d(50, -57), degToRad(-90)))
@@ -157,7 +164,7 @@ public class Autonomous extends LinearOpMode {
 
                         if (matchParameters.parkOpponentCrater) {
                             builder = TrajectoryManager.load("red_depot_right", drive.getPoseEstimate());
-                            markerAction = new IntakeAction(5.5, 7.5, rw);
+                            markerAction = new IntakeAction(6.5, 8.5, rw);
                             // builder = builder.turnTo(degToRad(-90)).splineTo(new Pose2d(new Vector2d(48, -60), 0));
                             // builder = builder.turnTo(degToRad(-180)).lineTo(new Vector2d(-9, -60));
                             // markerAction = new IntakeAction(6.5, 8.5, rw);
@@ -386,6 +393,8 @@ public class Autonomous extends LinearOpMode {
         rw.firstJoint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rw.firstJoint.setTargetPosition(-1100);
         rw.firstJoint.setPower(1);
+
+        rw.backServo.setPosition(BACK_SERVO_UP);
 
         SamplingArmAction samplingArmAction = new SamplingArmAction(0, 2, rw);
         Thread thread = new Thread(samplingArmAction);

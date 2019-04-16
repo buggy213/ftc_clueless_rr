@@ -46,7 +46,7 @@ public class IntakeAction extends TimeBasedAction {
     @Override
     public void update() {
         while(timer.time() < end) {
-            rw.intake.setPower(INTAKE_SPEED * 1.25);
+            rw.intake.setPower(INTAKE_SPEED * -1.25);
         }
         stop();
     }

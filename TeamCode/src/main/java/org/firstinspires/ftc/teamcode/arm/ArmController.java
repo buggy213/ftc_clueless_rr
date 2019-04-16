@@ -249,15 +249,15 @@ public class ArmController {
         double firstJointPower;
         double secondJointPower;
 
-
+        firstJointPower = 0;
 
         if (gamepad.left_stick_y == 0 && previousGamepad.left_stick_y != 0) {
             firstJointTarget = robotHardware.firstJoint.getCurrentPosition();
             firstJointPID.reset();
-            firstJointPower = firstJointPID.feedback(firstJointError);
+            // firstJointPower = firstJointPID.feedback(firstJointError);
         }
         else if (gamepad.left_stick_y == 0){
-            firstJointPower = firstJointPID.feedback(firstJointError);
+            // firstJointPower = firstJointPID.feedback(firstJointError);
         }
         else {
             firstJointPower = gamepad.left_stick_y;
