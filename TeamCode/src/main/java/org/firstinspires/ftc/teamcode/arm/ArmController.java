@@ -80,8 +80,8 @@ public class ArmController {
     public ArmController(RobotHardware robotHardware, Telemetry telemetry, boolean enabled) {
         this.robotHardware = robotHardware;
         kinematics = new TwoJointedArmKinematics(FIRST_JOINT_LENGTH, SECOND_JOINT_LENGTH);
-        robotHardware.firstJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robotHardware.secondJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // robotHardware.firstJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // robotHardware.secondJoint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         setEnabled(enabled);
         robotHardware.firstJoint.setDirection(DcMotorSimple.Direction.FORWARD);
